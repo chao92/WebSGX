@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<script type="text/javascript" src="cryptojs-extension-master/lib/cryptojs-aes.min.js"></script>
+	<script type="text/javascript" src="cryptojs-extension-master/build/cmac.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+
+	<!-- test web crypto  -->
+	<script type="text/javascript" src="js/webcrypto.js"></script>
+	<script type="text/javascript" src="js/client_main.js"></script>
+	<script type="text/javascript" src="js/attestation_client.js"></script>
+
+</head>
+<body>
+	<script type="text/javascript">
+		function unitArrayChangeEndian(uint8arr){
+			var tmpHex = byteToHexString(uint8arr);
+			var changedStr = changeEndian(tmpHex);
+			return hexStringToByte(changedStr);
+		}
+
+		var key = CryptoJS.enc.Hex.parse("00000000000000000000000000000000");
+		var message = "ef0b95974005c7a6d5a72590c398a0e1c07a8fda34e4f6856d228e6fd9bfe60c";
+
+		var key_derive_key = CryptoJS.CMAC(key, changeEndian(message));
+
+		console.log("first key");
+		console.log(key_derive_key.toString());
+
+		var derived_buffer = new Uint8Array(7);
+		derived_buffer.set([1],0);
+		var lable = convertStringToArrayBufferView("SMK");
+		console.log(lable);
+		derived_buffer.set(lable,1);
+
+		var key_length = new Uint16Array(1);
+		key_length.set([128],0);
+		var key_length_Uint8 = new Uint8Array(key_length.buffer);
+		console.log(key_length_Uint8);
+
+		derived_buffer.set(key_length_Uint8,5);
+		console.log("derived buffer");
+		console.log(byteToHexString(derived_buffer));
+
+		var second_key = CryptoJS.enc.Hex.parse(key_derive_key.toString());
+
+		console.log("second key");
+    	// console.log(second_key.toString());
+
+    	var smk = CryptoJS.CMAC(second_key,byteToHexString(derived_buffer));
+    	console.log(smk.toString());
+
+    	console.log("it should be 9188842a4f46599c02dfc11eba5b38");
+
+
+    </script>
+</body>
+</html>

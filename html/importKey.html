@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Import Key test page</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        div.result {
+            background-color: #cccccc;
+            word-wrap: break-word;
+        }
+        .cyphertext {
+            word-wrap: break-word;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Computing Demo <small>Client Attestation</small></h1>
+            <p>vk_key: shared secret key for REPORT_DATA
+                <br>mk_key: shared secret key for generating MAC's
+                <br> sk_key: shared secret key for encryption
+                <br>smk_key: used only for SIGMA protocol</p>
+        </div>
+
+        <h2>Client</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <button id="A_btn_start_import_key" class="btn btn-primary">Start import</button>
+
+            </div>
+            <div class="col-md-7 col-md-offset-1 result">
+                <h3>Input is: </h3>
+                <p>username: <span id="client_username" class="ciphertext">user1</span> </p>
+                <p>password: <span id="client_password" class="ciphertext">13313</span> </p>
+                <p>SSL Setting: <span id="client_password" class="ciphertext">nSSL</span> </p>
+                <p>Client Private Key (for signing ga_gb): <span id="client_private key" class="ciphertext">018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790</span> </p>
+                <h3>Extract Public key send from server and GID from Received MSG1 </h3>
+                <p>Client Received MSG1: <span id="A_RECEIVED MSG1" class="ciphertext"></span> </p>
+                <p>RECEIVED ga_x: <span id="A_RECEIVED_ga_x" class="ciphertext"></span> </p>
+                <p>RECEIVED ga_y: <span id="A_RECEIVED_ga_y" class="ciphertext"></span> </p>
+                <p>RECEIVED GID: <span id="A_RECEIVED_GID" class="ciphertext"></span> </p>
+                <h3>Construct MSG2 </h3>
+                <p>Client Public Key: <span id="A_ECCDH_public_key" class="ciphertext"></span>
+                </p>
+                <p>Client Private Key: <span id="A_ECCDH_private_key" class="ciphertext"></span>
+                </p>
+                <p>Client Shared_key: <span id="A_ECCDH_shared_key" class="ciphertext"></span> </p>
+                <p>Client derived smk_key: <span id="A_ECCDH_derived_smk_key" class="ciphertext"></span> </p>
+                <p>Client derived sk_key: <span id="A_ECCDH_derived_sk_key" class="ciphertext"></span> </p>
+                <p>Client derived mk_key: <span id="A_ECCDH_derived_mk_key" class="ciphertext"></span> </p>
+                <p>Client derived vk_key: <span id="A_ECCDH_derived_vk_key" class="ciphertext"></span> </p>
+
+            </div>
+        </div>
+
+        <h3>Acknowledgements</h3> A large part of the work on the jspaillier library was done at <a href="http://www.tno.nl">TNO</a> in a project supported by the <a href="http://www.commit-nl.nl">COMMIT</a> program.
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- add AES-CMAC -->
+    <script type="text/javascript" src="cryptojs-extension-master/lib/cryptojs-aes.min.js"></script>
+    <script type="text/javascript" src="cryptojs-extension-master/build/cmac.min.js"></script>
+    <!-- test web crypto  -->
+    <script type="text/javascript" src="js/webcrypto.js"></script>
+    <script type="text/javascript" src="js/client_main.js"></script>
+    <script type="text/javascript" src="js/attestation_client.js"></script>
+
+    <!-- end of web crypto -->
+    <script type="text/javascript">
+        $(function() {
+
+            //Client
+            $('#A_btn_start_import_key').click(function(event) {
+                // // user 1 key pair
+                var p = "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790";
+                var x = "72128a7a17526ebf85d03a623730aead3e3daaee9c60731db05be8621c4beb38";
+                var y = "d48140d950e2577b26eeb741e7c614e224b7bdc903f29a28a83cc81011145e06";
+                // generated from website
+
+                // var p = "11b5737cf9d93f17c0cb1a84655d3995a02824097effa5edd8ee26381eb5d6c3";
+                // var x = "a01532a3c0900053de60fbefefcca58793301598d308b41e6f4e364e388c2711";
+                // var y = "bef432c599148c94143d4ff46c2cb73e3e6a41d7eef23c047ea11e60667de425";
+
+                // var x = "6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296";
+                // var y = "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5";
+
+                // console.log("hexstring to byte")
+                // console.log(hexStringToByte(p));
+                // var imported_x,imported_y,imported_d;
+                // window.crypto.subtle.generateKey(
+                // {
+                // 	name: "ECDSA",
+                // 	        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                // 	    },
+                // 	    true, //whether the key is extractable (i.e. can be used in exportKey)
+                // 	    ["sign", "verify"] //can be any combination of "sign" and "verify"
+                // 	    )
+                // .then(function(key){
+                // 	    //returns a keypair object
+                // 	    console.log(key);
+                // 	    console.log(key.publicKey);
+                // 	    console.log(key.privateKey);
+                // 	    window.crypto.subtle.exportKey(
+                // 		    "jwk", //can be "jwk" (public or private), "spki" (public only), or "pkcs8" (private only)
+                // 		    key.publicKey //can be a publicKey or privateKey, as long as extractable was true
+                // 		    )
+                // 	    .then(function(keydata){
+                // 		    //returns the exported key data
+                // 		    console.log("public key")
+                // 		    console.log(keydata);
+                // 		})
+                // 	    .catch(function(err){
+                // 	    	console.error(err);
+                // 	    });
+                // 	    window.crypto.subtle.exportKey(
+                // 		    "pkcs8", //can be "jwk" (public or private), "spki" (public only), or "pkcs8" (private only)
+                // 		    key.privateKey //can be a publicKey or privateKey, as long as extractable was true
+                // 		    )
+                // 	    .then(function(keydata){
+                // 		    //returns the exported key data
+                // 		    console.log("private key with pkcs8 format")
+                // 		    console.log(keydata);
+                // 		    console.log(new Uint8Array(keydata));
+                // 		    // imported_d = keydata.d;
+                // 		    // imported_x = keydata.x;
+                // 		    // imported_y = keydata.y;
+                // 		})
+                // 	    .catch(function(err){
+                // 	    	console.error(err);
+                // 	    });
+                // 	})
+                // .catch(function(err){
+                // 	console.error(err);
+                // });
+
+                // console.log(Base64URL2HEX("zCQ5BPHPCLZYgdpo1n-x_90P2Ij52d53YVwTh3ZdiMo"));
+                // console.log(flippedString(x));
+                // console.log(changeEndian(x));
+                var gb = "7454bbdd10f367d0580d6cc24d501a80269b0d398e00ab4bf7504a22df0c124e640aaa2105cd3c81f77392a7e9d8be912c0c0b13be896620eef617d6dcfd3b65";
+                var ga = "58b4b5925fe89e974dd8a7791e7598bb5738ad1f7854e125b190d76d9af4f61950133916847aba687f1d1dac8bc466914c118a0991fd5584d38d02f27b6ed2fc";
+
+                var ga_big_endiness = changeEndian(ga);
+                var gb_big_endiness = changeEndian(gb);
+
+                var gb_ga_big_endiness = gb_big_endiness.concat(ga_big_endiness);
+
+                console.log(hexStringToByte(gb_ga_big_endiness));
+
+                window.crypto.subtle.importKey(
+                        "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+                        { //this is an example jwk key, other key types are Uint8Array objects
+                            kty: "EC",
+                            crv: "P-256",
+                            // x: HEX2Base64URL(flippedString(x)),
+                            // y: HEX2Base64URL(flippedString(y)),
+                            // d: HEX2Base64URL(flippedString(p)),
+                            // x: HEX2Base64URL(x.split("").reverse().join("")),
+                            // y: HEX2Base64URL(y.split("").reverse().join("")),
+                            // d: HEX2Base64URL(p.split("").reverse().join("")),
+                            x: HEX2Base64URL(changeEndian(x)),
+                            y: HEX2Base64URL(changeEndian(y)),
+                            // d: HEX2Base64URL(changeEndian(p)),
+                            // x: HEX2Base64URL(x),
+                            // y: HEX2Base64URL(y),
+                            d: HEX2Base64URL(p),
+                            // x: "zCQ5BPHPCLZYgdpo1n-x_90P2Ij52d53YVwTh3ZdiMo",
+                            // y: "pDfQTUx0-OiZc5ZuKMcA7v2Q7ZPKsQwzB58bft0JTko",
+                            // d: "7QeNmaMEUPJEdyfVNBCJE-Hu1pf2DDP8PfysKV2eyMs",
+                            ext: true,
+                        }, { //these are the algorithm options
+                            name: "ECDSA",
+                            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                        },
+                        false, //whether the key is extractable (i.e. can be used in exportKey)
+                        ["sign"] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key) //"verify" for public key import, "sign" for private key imports
+                    )
+                    .then(function(privateKey) {
+                        //returns a privateKey (or publicKey if you are importing a public key)
+                        console.log("improted private key is");
+                        console.log(privateKey);
+                        window.crypto.subtle.sign({
+                                    name: "ECDSA",
+                                    hash: {
+                                        name: "SHA-256"
+                                    }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+                                },
+                                privateKey, //from generateKey or importKey above
+                                // gb_ga //ArrayBuffer of data you want to sign 
+                                hexStringToByte(gb_ga_big_endiness)
+
+                            )
+                            .then(function(signature) {
+                                //returns an ArrayBuffer containing the signature
+                                console.log("signature");
+                                var msg2_sign_gb_ga = new Uint8Array(signature);
+                                console.log(new Uint8Array(signature));
+                                console.log(byteToHexString(msg2_sign_gb_ga));
+
+
+
+                            })
+                            .catch(function(err) {
+                                console.log("sign gb_ga error");
+                                console.error(err);
+                            });
+
+                    })
+                    .catch(function(e) {
+                        console.error(e);
+                        console.log('error_name: ' + e.name + ' error_message: ' + e.message);
+                        console.log('description: ' + e.description + ' error_number: ' + e.number);
+                    });
+
+
+            }); // end of Client
+
+        });
+    </script>
+</body>
+
+</html>
