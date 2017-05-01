@@ -106,7 +106,7 @@ return hexStr.toUpperCase();
 function hexStringToByte(str) {
   if (!str) {
     return new Uint8Array();
-}
+    }
 
 var a = [];
 for (var i = 0, len = str.length; i < len; i+=2) {
@@ -137,6 +137,139 @@ function flippedString(str){
     }
     return flipped_arr.join("").toString();
 }
+
+function derive_smk_key(shared_key){
+
+    var key = CryptoJS.enc.Hex.parse("00000000000000000000000000000000");
+    var message = CryptoJS.enc.Hex.parse(shared_key);
+    var key_derive_key = CryptoJS.CMAC(key, message);
+
+    // console.log("first key");
+    // console.log(key_derive_key.toString());
+
+    var derived_buffer = new Uint8Array(7);
+    derived_buffer.set([1],0);
+    var lable = convertStringToArrayBufferView("SMK");
+    // console.log(lable);
+    derived_buffer.set(lable,1);
+
+    var key_length = new Uint16Array(1);
+    key_length.set([128],0);
+    var key_length_Uint8 = new Uint8Array(key_length.buffer);
+    // console.log(key_length_Uint8);
+
+    derived_buffer.set(key_length_Uint8,5);
+    // console.log("derived buffer");
+    // console.log(byteToHexString(derived_buffer));
+
+    var second_key = CryptoJS.enc.Hex.parse(key_derive_key.toString());
+    var second_msg = CryptoJS.enc.Hex.parse(byteToHexString(derived_buffer));
+
+    var smk = CryptoJS.CMAC(second_key,second_msg);
+    return smk.toString();
+}
+
+function derive_mk_key(shared_key){
+
+    var key = CryptoJS.enc.Hex.parse("00000000000000000000000000000000");
+    var message = CryptoJS.enc.Hex.parse(shared_key);
+    var key_derive_key = CryptoJS.CMAC(key, message);
+
+    // console.log("first key");
+    // console.log(key_derive_key.toString());
+
+    var derived_buffer = new Uint8Array(6);
+    derived_buffer.set([1],0);
+    var lable = convertStringToArrayBufferView("MK");
+    // console.log(lable);
+    derived_buffer.set(lable,1);
+
+    var key_length = new Uint16Array(1);
+    key_length.set([128],0);
+    var key_length_Uint8 = new Uint8Array(key_length.buffer);
+    // console.log(key_length_Uint8);
+
+    derived_buffer.set(key_length_Uint8,4);
+    // console.log("derived buffer");
+    // console.log(byteToHexString(derived_buffer));
+
+    var second_key = CryptoJS.enc.Hex.parse(key_derive_key.toString());
+    var second_msg = CryptoJS.enc.Hex.parse(byteToHexString(derived_buffer));
+
+    var mk = CryptoJS.CMAC(second_key,second_msg);
+    return mk.toString();
+}
+
+function derive_sk_key(shared_key){
+
+    var key = CryptoJS.enc.Hex.parse("00000000000000000000000000000000");
+    var message = CryptoJS.enc.Hex.parse(shared_key);
+    var key_derive_key = CryptoJS.CMAC(key, message);
+
+    // console.log("first key");
+    // console.log(key_derive_key.toString());
+
+    var derived_buffer = new Uint8Array(6);
+    derived_buffer.set([1],0);
+    var lable = convertStringToArrayBufferView("SK");
+    // console.log(lable);
+    derived_buffer.set(lable,1);
+
+    var key_length = new Uint16Array(1);
+    key_length.set([128],0);
+    var key_length_Uint8 = new Uint8Array(key_length.buffer);
+    // console.log(key_length_Uint8);
+
+    derived_buffer.set(key_length_Uint8,4);
+    // console.log("derived buffer");
+    // console.log(byteToHexString(derived_buffer));
+
+    var second_key = CryptoJS.enc.Hex.parse(key_derive_key.toString());
+    var second_msg = CryptoJS.enc.Hex.parse(byteToHexString(derived_buffer));
+
+    var sk = CryptoJS.CMAC(second_key,second_msg);
+    return sk.toString();
+}
+
+function derive_vk_key(shared_key){
+
+    var key = CryptoJS.enc.Hex.parse("00000000000000000000000000000000");
+    var message = CryptoJS.enc.Hex.parse(shared_key);
+    var key_derive_key = CryptoJS.CMAC(key, message);
+
+    // console.log("first key");
+    // console.log(key_derive_key.toString());
+
+    var derived_buffer = new Uint8Array(6);
+    derived_buffer.set([1],0);
+    var lable = convertStringToArrayBufferView("VK");
+    // console.log(lable);
+    derived_buffer.set(lable,1);
+
+    var key_length = new Uint16Array(1);
+    key_length.set([128],0);
+    var key_length_Uint8 = new Uint8Array(key_length.buffer);
+    // console.log(key_length_Uint8);
+
+    derived_buffer.set(key_length_Uint8,4);
+    // console.log("derived buffer");
+    // console.log(byteToHexString(derived_buffer));
+
+    var second_key = CryptoJS.enc.Hex.parse(key_derive_key.toString());
+    var second_msg = CryptoJS.enc.Hex.parse(byteToHexString(derived_buffer));
+
+    var vk = CryptoJS.CMAC(second_key,second_msg);
+    return vk.toString();
+}
+// function deriveKey(dh_shared_key, keyType){
+
+//     switch(keyType){
+//         case 0:
+//         case 1:
+//         case 2:
+
+//     }
+// }
 
 // var data = "QNimate";
 

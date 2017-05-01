@@ -27,7 +27,7 @@ function changeString($input){
 if ($_POST) {
 	$username = $_POST['username'];
 	$password = $_POST['password'];
-	// $private_key = $_POST['private_key'];
+	$private_key = $_POST['private_key'];
 	$SSLSetting = $_POST['SSL'];
 	// $res = array('username' => $username, 'password' => $password);
 	// echo json_encode($res);
@@ -47,8 +47,6 @@ if ($_POST) {
 	if ($result === false){
 		echo "Failed: ". socket_strerror(socket_last_error($socket))."\n";
 	}
-
-	// $GLOBALS['socket'] = $socket;
 
 	$out = '';
 
@@ -146,10 +144,6 @@ if ($_POST) {
 	// $GID = flipString(substr(bin2hex($MSG1),128,8));
 	
 	$res = array('ga_x' => $ga_x, 'ga_y' => $ga_y, 'GID'=> $GID);
-
-	socket_shutdown($socket, 2);
-    socket_close($socket);
-    unset($socket);
 	echo json_encode($res); 
 	// echo "ga_x: is ".$ga_x."<br/>"."ga_y is ".$ga_y."<br/>";
 

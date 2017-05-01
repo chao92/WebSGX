@@ -98,14 +98,14 @@
                 var ga_little;
                 var gb_little;
 
-                var C_privateKey = "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"; // big-endiness
-                var C_privateKey_x = "72128a7a17526ebf85d03a623730aead3e3daaee9c60731db05be8621c4beb38"; // little-endiness
-                var C_privateKey_y = "d48140d950e2577b26eeb741e7c614e224b7bdc903f29a28a83cc81011145e06"; // little-endienss
+                var C_privateKey = "7d765c220fcc805e57a185d3f5c4038f0635da25a2bec756155e986dd932b4ac"; // big-endiness
+                var C_privateKey_x = "d11e9594eca01daa8a7939e946b033c2f323c527348e40b5cd23a5ccea161aa0"; // little-endiness
+                var C_privateKey_y = "44b34aa1847b81825016e217d3cd2177dd4105ad9f32ec491f292afaf8a76cdf"; // little-endienss
 
                 console.log("click start attestation button");
                 var msg1_request_data = {
-                    'username': "user1",
-                    'password': "13313",
+                    'username': "user2",
+                    'password': "f322",
                     'SSL': "nSSL",
                     // 'privateKey': "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"
                 };
@@ -446,7 +446,7 @@
                                                             console.log(hexstring_msg2);
 
                                                             var msg2_request_data = {
-                                                                'client_id': 0,
+                                                                'client_id': 1,
                                                                 'length': 176,
                                                                 'msg2': hexstring_msg2,
 
@@ -464,7 +464,7 @@
                                                                     // receiving msg3
 
                                                                     var msg3_request_data = {
-                                                                        'client_id': 0,
+                                                                        'client_id': 1,
                                                                     };
                                                                     $.ajax({
                                                                         type: "POST",
@@ -677,7 +677,7 @@
                                                                             // msg4_body_g_secrets.set([0,1,2,3,4,5,6,7],0);
 
                                                                             var secret_plain_tex = new Uint8Array(8);
-                                                                            secret_plain_tex.set([0,1,2,3,4,5,6,7],0);
+                                                                            secret_plain_tex.set([8,9,10,11,12,13,14,15],0);
 
                                                                             // encrypt g_secrets using sk_key with algorithm aes-gcm
 
@@ -772,7 +772,7 @@
 
                                                                                     // send msg4 to server
                                                                                     var msg4_request_data = {
-                                                                                        'client_id': 0,
+                                                                                        'client_id': 1,
                                                                                         'length': 161,
                                                                                         'msg4': hexstring_msg4,
                                                                                     };

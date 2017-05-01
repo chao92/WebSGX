@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Demo page</title>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<style type="text/css">
+		div.result {
+			background-color: #cccccc;
+			word-wrap: break-word;
+		}
+
+		.cyphertext {
+			word-wrap: break-word;
+		}
+	</style>
+
+</head>
+
+<body>
+	<div class="container">
+		<div class="page-header">
+			<h1>Computing Demo <small>Client Attestation</small></h1>
+			<p>vk_key: shared secret key for REPORT_DATA<br>mk_key: shared secret key for generating MAC's <br> sk_key: shared secret key for encryption<br>smk_key: used only for SIGMA protocol</p>
+		</div>
+
+		<h3>ECCDH Key Pair Generation</h3>
+		<h2>Alice</h2>
+		<div class="row">
+			<div class="col-md-4">
+				<button id="A_btn_gen_ECCDH_keypair" class="btn btn-primary">Generate Keypair</button>
+				<br><br>
+				<button id="A_btn_gen_ECCDH_derived_key" class="btn btn-primary">Generate Shared Key bits</button>
+				<br><br>
+				<button id="A_btn_gen_ECCDH_smk_sk_key" class="btn btn-primary">Generate smk_key and sk_key</button>
+				<br><br>
+				<button id="A_btn_gen_ECCDH_mk_vk_key" class="btn btn-primary">Generate mk_key and vk_key</button>
+				<br><br>
+				<button id="A_btn_sgin_gagb" class="btn btn-primary">Sgin Ga Gb</button>
+				<br><br>
+				<button id="A_btn_gen_MSG2" class="btn btn-primary">Generate MSG2</button>
+			</div>
+			<div class="col-md-7 col-md-offset-1 result">
+				<p>Public Key: <span id="A_ECCDH_public_key" class="ciphertext">-</span></p>
+				<p>Private Key: <span id="A_ECCDH_private_key" class="ciphertext">-</span></p>
+				<p>Shared_key: <span id="A_ECCDH_shared_key" class="ciphertext">-</span> </p>
+				<p>smk_key: <span id="A_ECCDH_derived_smk_key" class="ciphertext">-</span> </p>
+				<p>sk_key: <span id="A_ECCDH_derived_sk_key" class="ciphertext">-</span> </p>
+				<p>mk_key: <span id="A_ECCDH_derived_mk_key" class="ciphertext">-</span> </p>
+				<p>vk_key: <span id="A_ECCDH_derived_vk_key" class="ciphertext">-</span> </p>
+
+			</div>
+		</div>
+
+		<h2>Bob</h2>
+		<div class="row">
+			<div class="col-md-4">
+				<button id="B_btn_gen_ECCDH_keypair" class="btn btn-primary">Generate Keypair</button>
+				<br><br>
+				<button id="B_btn_gen_ECCDH_derived_key" class="btn btn-primary">Generate Shared Key bits</button>
+				<br><br>
+				<button id="Test_AES_CMAC" class="btn btn-primary">Test AES-CMAC</button>
+			</div>
+			<div class="col-md-7 col-md-offset-1 result">
+				<p>Public Key: <span id="B_ECCDH_public_key" class="ciphertext">-</span></p>
+				<p>Private Key: <span id="B_ECCDH_private_key" class="ciphertext">-</span></p>
+				<p>Shared_key: <span id="B_ECCDH_shared_key" class="ciphertext">-</span> </p>
+			</div>
+		</div>
+
+		<h3>Acknowledgements</h3>
+		A large part of the work on the jspaillier library was done at <a href="http://www.tno.nl">TNO</a> in a project supported by the <a href="http://www.commit-nl.nl">COMMIT</a> program.
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+
+
+
+    <!-- add AES-CMAC -->
+    <script src="//ajax.googleapis.com/ajax/libs/dojo/1.12.1/dojo/dojo.js"></script>
+    <script type="text/javascript" src="js/sjcl.js"></script>
+	<!-- <script type="text/javascript" src="js/require.js"></script> -->
+	<script type="text/javascript" src="js/AesCmac.js"></script>
+	<!-- test web crypto  -->
+	<script type="text/javascript" src="js/webcrypto.js"></script>
+	<script type="text/javascript" src="js/client_main.js"></script>
+	<script type="text/javascript" src="js/attestation_client.js"></script>
+	
+	<!-- end of web crypto -->
+	<script type="text/javascript">
+		
+		$(function() {
+
+		//Alice
+		$('#A_btn_gen_ECCDH_keypair').click(function(event) {
+			var crypto = window.crypto || window.msCrypto;
+			if (crypto.subtle) {
+				promise_key = crypto.subtle.generateKey({name: "ECDH", namedCurve: "P-256",}, true, ["deriveKey", "deriveBits"]);
+				promise_key.then(function(key) {
+					A_private_key_object = key.privateKey;
+					A_public_key_object = key.publicKey;
+
+					exported_public_key = crypto.subtle.exportKey("jwk", A_public_key_object);//base64url encoding
+					exported_public_key.then(function(key) {
+								//returns the exported key data
+								
+								var plainKey = "<br> x: " + Base64URL2HEX(key.x) +"<br>"+ "y: " + Base64URL2HEX(key.y);
+								A_public_key_x_exported = hexStringToByte(Base64URL2HEX(key.x));
+								A_public_key_y_exported = hexStringToByte(Base64URL2HEX(key.y));
+
+								$('#A_ECCDH_public_key').html(plainKey);
+								console.log("A Public key");
+								console.log(A_public_key_object)
+								console.log("A Private key");
+								console.log(A_private_key_object)
+
+								
+							});
+					exported_public_key.catch = function(e) {
+						console.log(e.message);
+					}
+
+					exported_priv_key = crypto.subtle.exportKey("jwk", A_private_key_object);//base64url encoding
+					exported_priv_key.then(function(key) {
+								//returns the exported key data
+								console.log("private key");
+
+								// A_private_key_exported = hexStringToByte(Base64URL2HEX(key.d));
+
+								$('#A_ECCDH_private_key').html(Base64URL2HEX(key.d));
+								
+							});
+					exported_priv_key.catch = function(e) {
+						console.log(e.message);
+					}
+				});
+				promise_key.catch = function(e) {
+					console.log(e.message);
+				}
+			} else {
+				alert("Cryptography API not Supported");
+			}
+
+		});
+
+		// derived shared key using itself private key and bob's public key
+		$('#A_btn_gen_ECCDH_derived_key').click(function(event) {
+			A_comput_shared_dhkey(A_private_key_object, B_public_key_object);
+		});
+
+
+		// derived the supplied keys
+		$('#A_btn_gen_ECCDH_smk_sk_key').click(function(event) {
+			
+			console.log("geenrate smk_sk keys")
+			derive_smk_sk_key(new Uint8Array(A_derived_key), 0);
+			
+		});
+
+		$('#A_btn_gen_ECCDH_mk_vk_key').click(function(event) {
+			
+			console.log("geenrate mk_vk keys")
+			derive_mk_vk_key(new Uint8Array(A_derived_key), 1);
+			
+		});
+		$('#A_btn_sgin_gagb').click(function(event) {
+			
+			console.log("sgin gagb")
+			var A_public_key_array = new Uint8Array(64);
+			A_public_key_array.set(A_public_key_x_exported, 0);
+  			A_public_key_array.set(A_public_key_y_exported, A_public_key_x_exported.byteLength);
+			var B_public_key_array = new Uint8Array(64);
+			B_public_key_array.set(B_public_key_x_exported, 0);
+  			B_public_key_array.set(B_public_key_y_exported, B_public_key_x_exported.byteLength);
+			// var A_private_key_array = A_private_key_exported;
+
+
+			ECDSA_sign(A_private_key_object, A_public_key_array, B_public_key_array);
+			
+		});
+
+		
+		// end of Alice
+
+
+		// bob 
+		$('#B_btn_gen_ECCDH_keypair').click(function(event) {
+			var crypto = window.crypto || window.msCrypto;
+			if (crypto.subtle) {
+				promise_key = crypto.subtle.generateKey({name: "ECDH", namedCurve: "P-256",}, true, ["deriveKey", "deriveBits"]);
+				promise_key.then(function(key) {
+					B_private_key_object = key.privateKey;
+					B_public_key_object = key.publicKey;
+
+					exported_public_key = crypto.subtle.exportKey("jwk", B_public_key_object);
+					exported_public_key.then(function(key) {
+								//returns the exported key data
+								var plainKey = "<br> x: " + Base64URL2HEX(key.x) +"<br>"+ "y: " + Base64URL2HEX(key.y);
+								$('#B_ECCDH_public_key').html(plainKey);
+								B_public_key_x_exported = hexStringToByte(Base64URL2HEX(key.x));
+								B_public_key_y_exported	= hexStringToByte(Base64URL2HEX(key.y));
+
+								
+							});
+					exported_public_key.catch = function(e) {
+						console.log(e.message);
+					}
+					exported_priv_key = crypto.subtle.exportKey("jwk", B_private_key_object);
+					exported_priv_key.then(function(key) {
+								//returns the exported key data
+								$('#B_ECCDH_private_key').html(Base64URL2HEX(key.d));
+								
+							});
+					exported_public_key.catch = function(e) {
+						console.log(e.message);
+					}
+
+
+
+				});
+				promise_key.catch = function(e) {
+					console.log(e.message);
+				}
+			} else {
+				alert("Cryptography API not Supported");
+			}
+		});
+
+		// derived shared key using itself private key and Alice's public key
+		$('#B_btn_gen_ECCDH_derived_key').click(function(event) {
+			B_comput_shared_dhkey(B_private_key_object, A_public_key_object);
+			// console.log("save shared key type is " + typeof(B_derived_key));
+			
+		});
+
+		$('#Test_AES_CMAC').click(function(event) {
+			 var AesCmac = require("js/AesCmac");
+			 var cmac = new AesCmac();
+			 cmac.init("0x2b7e151628aed2a6abf7158809cf4f3c");
+
+			// Test AES-128 on zero initialization vector
+			var t_0 = cmac._encrypt(cmac.const_Zero);
+			var aes_0 = sjcl.codec.hex.toBits("0x7df76b0c1ab899b33e42f047b91b546f");
+			sjcl.bitArray.equal(t_0, aes_0) ? console.log("AES test passed!") : console
+			.error("AES test failed!");
+
+			// Test subkey equality
+			var subkeys = cmac.generateSubkeys();
+			var K1 = sjcl.codec.hex.toBits("0xfbeed618357133667c85e08f7236a8de");
+			sjcl.bitArray.equal(subkeys["K1"], K1) ? console.log("K1 test passed!") : console
+			.error("K1 test failed!");
+			var K2 = sjcl.codec.hex.toBits("0xf7ddac306ae266ccf90bc11ee46d513b");
+			sjcl.bitArray.equal(subkeys["K2"], K2) ? console.log("K2 test passed!") : console
+			.error("K2 test failed!");
+
+			/**
+			 * <pre>
+			 * Example 1: len = 0
+			 * M              &lt;empty string&gt;
+			 * AES-CMAC       bb1d6929 e9593728 7fa37d12 9b756746
+			 * </pre>
+			 */
+			 var m1 = "";
+			 var cmac1 = cmac.generateCmac(m1);
+			 var ex1 = sjcl.codec.hex.toBits("0xbb1d6929e95937287fa37d129b756746")
+			 sjcl.bitArray.equal(ex1, cmac1) ? console.log("cmac1 test passed!") : console
+			 .error("cmac1 test failed!");
+			 if (sjcl.codec.hex.fromBits(cmac1) !== "bb1d6929e95937287fa37d129b756746")
+			 	console.error(sjcl.codec.hex.fromBits(cmac1) + " !== bb1d6929e95937287fa37d129b756746");
+			
+		});
+
+
+
+		// end of bob
+	});
+</script>
+</body>
+
+</html>

@@ -69,14 +69,19 @@
     <!-- test web crypto  -->
     <script type="text/javascript" src="js/webcrypto.js"></script>
     <!-- end of web crypto -->
+    <!-- test synchronization -->
+    <script type="text/javascript" src="js/synchronization.js"></script>
+    <!-- end of test synchronization -->
 
     <script type="text/javascript">
         $(function() {
 
-            //Client
+            //Client start attestation
             $('#A_btn_start_Attestation').click(function(event) {
 
-                // received from msg1
+                if(!isAttestating()){// if no one is attestating
+
+                    // received from msg1
                 var C_RECEIVED_ga_x;
                 var A_RECEIVED_ga_y;
                 var C_RECEIVED_GID;
@@ -446,7 +451,6 @@
                                                             console.log(hexstring_msg2);
 
                                                             var msg2_request_data = {
-                                                                'client_id': 0,
                                                                 'length': 176,
                                                                 'msg2': hexstring_msg2,
 
@@ -464,7 +468,7 @@
                                                                     // receiving msg3
 
                                                                     var msg3_request_data = {
-                                                                        'client_id': 0,
+                                                                        'start': 1,
                                                                     };
                                                                     $.ajax({
                                                                         type: "POST",
@@ -770,31 +774,39 @@
                                                                                     var hexstring_msg4 = byteToHexString(msg4_full);
                                                                                     console.log(hexstring_msg4);
 
-                                                                                    // send msg4 to server
-                                                                                    var msg4_request_data = {
-                                                                                        'client_id': 0,
-                                                                                        'length': 161,
-                                                                                        'msg4': hexstring_msg4,
-                                                                                    };
-                                                                                    $.ajax({
-                                                                                        type: "POST",
-                                                                                        url: "send_MSG4.php",
-                                                                                        data: msg4_request_data,
-                                                                                        dataType: "JSON",
-                                                                                        success: function(response) {
+                                                                                    var attestation_passed = false;
 
-                                                                                            console.log(response);
-                                                                                            console.log(response['signal']);
+                                                                                    while(true){
 
-                                                                                        },
-                                                                                        error: function(jqXHR, textStatus, errorThrown) {
-                                                                                            console.log(textStatus, errorThrown);
+                                                                                        attestation_passed = setTimeout(isAttestationPassed(),3000); // run after 3 seconds
+                                                                                        
+                                                                                        if (attestation_passed) {
+                                                                                            // send msg4 to server
+                                                                                            var msg4_request_data = {
+                                                                                                'length': 161,
+                                                                                                'msg4': hexstring_msg4,
+                                                                                            };
+                                                                                            $.ajax({
+                                                                                                type: "POST",
+                                                                                                url: "send_MSG4.php",
+                                                                                                data: msg4_request_data,
+                                                                                                dataType: "JSON",
+                                                                                                success: function(response) {
+
+                                                                                                    console.log(response);
+                                                                                                    console.log(response['signal']);
+
+                                                                                                },
+                                                                                                error: function(jqXHR, textStatus, errorThrown) {
+                                                                                                    console.log(textStatus, errorThrown);
+                                                                                                }
+
+
+                                                                                            }); // sending msg4 to server
+
                                                                                         }
-
-
-                                                                                    }); // sending msg4 to server
-
-
+                                                                                    }
+                                                                               
                                                                                 })
                                                                                 .catch(function(err){
                                                                                     console.log("encrypt fail")
@@ -860,6 +872,8 @@
                         return false;
                     }
                 });
+
+                }// if no one is attestating
 
             }); // end of Client
 
