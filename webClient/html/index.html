@@ -25,20 +25,42 @@
                 <br>mk_key: shared secret key for generating MAC's
                 <br> sk_key: shared secret key for encryption
                 <br>smk_key: used only for SIGMA protocol</p>
-        </div>
-
-        <h2>Client</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <button id="A_btn_start_Attestation" class="btn btn-primary">Start Attestation</button>
-
             </div>
-            <div class="col-md-7 col-md-offset-1 result">
+
+            <h2>Client</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="usr">Name:</label>
+                      <input type="text" class="form-control" id="usr">
+                  </div>
+                  <div class="form-group">
+                      <label for="pwd">Password:</label>
+                      <input type="password" class="form-control" id="pwd">
+                  </div>
+                  <div class="form-group">
+                      <label for="priKey">Private Key:</label>
+                      <input type="password" class="form-control" id="priKey">
+                  </div>
+                  <div class="form-group">
+                      <label for="pubKey_x">Public Key x:</label>
+                      <input type="password" class="form-control" id="pubKey_x">
+                  </div>
+                  <div class="form-group">
+                      <label for="pubKey_y">Public Key y:</label>
+                      <input type="password" class="form-control" id="pubKey_y">
+                  </div>
+                  <button id="A_btn_start_Attestation" class="btn btn-primary">Start Attestation</button>
+
+              </div>
+              <div class="col-md-7 col-md-offset-1 result">
                 <h3>Input is: </h3>
-                <p>username: <span id="client_username" class="ciphertext">user1</span> </p>
-                <p>password: <span id="client_password" class="ciphertext">13313</span> </p>
+                <p>username: <span id="client_username" class="ciphertext"></span> </p>
+                <p>password: <span id="client_password" class="ciphertext"></span> </p>
                 <p>SSL Setting: <span id="client_password" class="ciphertext">nSSL</span> </p>
-                <p>Client Private Key (for signing ga_gb): <span id="client_private key" class="ciphertext">018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790</span> </p>
+                <p>Client Private Key (for signing ga_gb): <span id="client_private_key" class="ciphertext"></span> </p>
+                <p>Client Public Key x: <span id="client_public_key_x" class="ciphertext"></span> </p>
+                <p>Client Public Key y: <span id="client_public_key_y" class="ciphertext"></span> </p>
                 <h3>Extract Public key send from server and GID from Received MSG1 </h3>
                 <p>Client Received MSG1: <span id="A_RECEIVED MSG1" class="ciphertext"></span> </p>
                 <p>RECEIVED ga_x: <span id="C_RECEIVED_ga_x" class="ciphertext"></span> </p>
@@ -76,6 +98,15 @@
             //Client
             $('#A_btn_start_Attestation').click(function(event) {
 
+
+                $("#client_username").text($("#usr").val());
+                var client_userName = $("#usr").val();
+                $("#client_password").text($("#pwd").val());
+                var client_password = $("#pwd").val();
+                $("#client_private_key").text($("#priKey").val());
+                $("#client_public_key_x").text($("#pubKey_x").val());
+                $("#client_public_key_y").text($("#pubKey_y").val());
+
                 // received from msg1
                 var C_RECEIVED_ga_x;
                 var A_RECEIVED_ga_y;
@@ -98,17 +129,39 @@
                 var ga_little;
                 var gb_little;
 
-                var C_privateKey = "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"; // big-endiness
-                var C_privateKey_x = "72128a7a17526ebf85d03a623730aead3e3daaee9c60731db05be8621c4beb38"; // little-endiness
-                var C_privateKey_y = "d48140d950e2577b26eeb741e7c614e224b7bdc903f29a28a83cc81011145e06"; // little-endienss
+                // var C_privateKey = "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"; // big-endiness
+                // var C_privateKey_x = "72128a7a17526ebf85d03a623730aead3e3daaee9c60731db05be8621c4beb38"; // little-endiness
+                // var C_privateKey_y = "d48140d950e2577b26eeb741e7c614e224b7bdc903f29a28a83cc81011145e06"; // little-endienss
+
+                var C_privateKey = $("#priKey").val();
+                var C_privateKey_x = $("#pubKey_x").val();
+                var C_privateKey_y = $("#pubKey_y").val();
 
                 console.log("click start attestation button");
+
+
+
                 var msg1_request_data = {
-                    'username': "user1",
-                    'password': "13313",
+                    'username': client_userName,
+                    'password': client_password,
                     'SSL': "nSSL",
                     // 'privateKey': "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"
                 };
+
+                var client_ID = client_userName.match(/\d+/)[0]-1; 
+
+                // var msg1_request_data = {
+                //     'username': "user1",
+                //     'password': "13313",
+                //     'SSL': "nSSL",
+                //     // 'privateKey': "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"
+                // };
+                console.log("print input");
+                console.log(client_userName);
+                console.log(client_password);
+                console.log(C_privateKey);
+                console.log(C_privateKey_x);
+                console.log(C_privateKey_y);
                 $.ajax({
                     type: "POST",
                     url: "recv_MSG1.php",
@@ -151,15 +204,15 @@
                         }
                         if (window.crypto.subtle) {
                             window.crypto.subtle.generateKey({
-                                    name: "ECDH",
-                                    namedCurve: "P-256",
-                                }, true, ["deriveKey", "deriveBits"])
-                                .then(function(key) {
-                                    C_private_key_object = key.privateKey;
-                                    C_public_key_object = key.publicKey;
+                                name: "ECDH",
+                                namedCurve: "P-256",
+                            }, true, ["deriveKey", "deriveBits"])
+                            .then(function(key) {
+                                C_private_key_object = key.privateKey;
+                                C_public_key_object = key.publicKey;
 
                                     window.crypto.subtle.exportKey("jwk", C_public_key_object) //base64url encoding
-                                        .then(function(key) {
+                                    .then(function(key) {
                                             //returns the exported key data
 
                                             var plainKey = "<br> x: " + Base64URL2HEX(key.x) + "<br>" + "y: " + Base64URL2HEX(key.y);
@@ -186,24 +239,24 @@
                                             $('#C_ECCDH_public_key').html(plainKey);
 
                                         }).catch = function(e) {
-                                            console.log("export public key error");
-                                            console.log(e.message);
-                                        }
+                                        console.log("export public key error");
+                                        console.log(e.message);
+                                    }
 
                                     window.crypto.subtle.exportKey("jwk", C_private_key_object) //base64url encoding
-                                        .then(function(key) {
+                                    .then(function(key) {
 
-                                            $('#C_ECCDH_private_key').html(Base64URL2HEX(key.d));
-                                            console.log(key);
+                                        $('#C_ECCDH_private_key').html(Base64URL2HEX(key.d));
+                                        console.log(key);
 
-                                        }).catch = function(e) {
-                                            console.log("export public key error");
-                                            console.log(e.message);
-                                        }
+                                    }).catch = function(e) {
+                                        console.log("export public key error");
+                                        console.log(e.message);
+                                    }
                                 }).catch = function(e) {
-                                    console.log("generate key error");
-                                    console.log(e.message);
-                                }
+                                console.log("generate key error");
+                                console.log(e.message);
+                            }
 
                             window.crypto.subtle.importKey(
                                     "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
@@ -220,8 +273,8 @@
                                     },
                                     false, //whether the key is extractable (i.e. can be used in exportKey)
                                     [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
-                                )
-                                .then(function(publicKey) {
+                                    )
+                            .then(function(publicKey) {
                                     //returns a privateKey (or publicKey if you are importing a public key)
                                     console.log("improted public key based on big-endiness ga");
                                     console.log(publicKey);
@@ -229,7 +282,7 @@
                                     //derived shared key using client itself private key (just generated above) and Server's public key g_a
                                     // A_comput_shared_dhkey(A_private_key_object, publicKey);
                                     window.crypto.subtle.deriveBits({
-                                                name: "ECDH",
+                                        name: "ECDH",
                                                 namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
                                                 public: publicKey, //an ECDH public key from generateKey or importKey
                                             },
@@ -332,21 +385,21 @@
                                                     },
                                                     false, //whether the key is extractable (i.e. can be used in exportKey)
                                                     ["sign"] //"verify" for public key import, "sign" for private key imports
-                                                )
-                                                .then(function(privateKey) {
+                                                    )
+                                            .then(function(privateKey) {
                                                     //returns a publicKey (or privateKey if you are importing a private key)
                                                     console.log(privateKey);
                                                     // sgin gb_ga with improted privateKey
                                                     window.crypto.subtle.sign({
-                                                                name: "ECDSA",
-                                                                hash: {
-                                                                    name: "SHA-256"
+                                                        name: "ECDSA",
+                                                        hash: {
+                                                            name: "SHA-256"
                                                                 }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
                                                             },
                                                             privateKey, //from generateKey or importKey above
                                                             // gb_ga //ArrayBuffer of data you want to sign 
                                                             gb_ga_little_endian
-                                                        )
+                                                            )
                                                         .then(function(signature) { // this signature should also big-endiness 
                                                             //returns an ArrayBuffer containing the signature
                                                             console.log("signature");
@@ -446,7 +499,7 @@
                                                             console.log(hexstring_msg2);
 
                                                             var msg2_request_data = {
-                                                                'client_id': 0,
+                                                                'client_id': client_ID,
                                                                 'length': 176,
                                                                 'msg2': hexstring_msg2,
 
@@ -464,7 +517,7 @@
                                                                     // receiving msg3
 
                                                                     var msg3_request_data = {
-                                                                        'client_id': 0,
+                                                                        'client_id': client_ID,
                                                                     };
                                                                     $.ajax({
                                                                         type: "POST",
@@ -540,11 +593,11 @@
                                                                             var report_data = report_body.substring(640, 768);
 
                                                                             window.crypto.subtle.digest({
-                                                                                        name: "SHA-256",
-                                                                                    },
+                                                                                name: "SHA-256",
+                                                                            },
                                                                                     ga_gb_vk //The data you want to hash as an ArrayBuffer
-                                                                                )
-                                                                                .then(function(hash) {
+                                                                                    )
+                                                                            .then(function(hash) {
                                                                                     //returns the hash as an ArrayBuffer
                                                                                     var digest_data = new Uint8Array(hash);
                                                                                     console.log("generated sha256hash is")
@@ -615,9 +668,9 @@
                                                                                     }
 
                                                                                 })
-                                                                                .catch(function(err) {
-                                                                                    console.error(err);
-                                                                                });
+.catch(function(err) {
+    console.error(err);
+});
 
                                                                             // send msg4 to server
 
@@ -684,17 +737,17 @@
                                                                             window.crypto.subtle.importKey(
                                                                                 "jwk", //can be "jwk" or "raw"
                                                                                 {   //this is an example jwk key, "raw" would be an ArrayBuffer
-                                                                                    kty: "oct",
-                                                                                    k: HEX2Base64URL(C_sk_key),
-                                                                                    alg: "A128GCM",
-                                                                                    ext: true,
-                                                                                },
+                                                                                kty: "oct",
+                                                                                k: HEX2Base64URL(C_sk_key),
+                                                                                alg: "A128GCM",
+                                                                                ext: true,
+                                                                            },
                                                                                 {   //this is the algorithm options
                                                                                     name: "AES-GCM",
                                                                                 },
                                                                                 false, //whether the key is extractable (i.e. can be used in exportKey)
                                                                                 ["encrypt", "decrypt"] //can "encrypt", "decrypt", "wrapKey", or "unwrapKey"
-                                                                            )
+                                                                                )
                                                                             .then(function(sk_key){
                                                                                 //returns the symmetric key
                                                                                 console.log("imported sk_key for AES-GCM128");
@@ -707,8 +760,8 @@
 
 
                                                                                 window.crypto.subtle.encrypt(
-                                                                                    {
-                                                                                        name: "AES-GCM",
+                                                                                {
+                                                                                    name: "AES-GCM",
 
                                                                                         //Don't re-use initialization vectors!
                                                                                         //Always generate a new iv every time your encrypt!
@@ -724,7 +777,7 @@
                                                                                     },
                                                                                     sk_key, //from generateKey or importKey above
                                                                                     secret_plain_tex //ArrayBuffer of data you want to encrypt
-                                                                                )
+                                                                                    )
                                                                                 .then(function(encrypted){
                                                                                     //returns an ArrayBuffer containing the encrypted data
                                                                                     
@@ -772,7 +825,7 @@
 
                                                                                     // send msg4 to server
                                                                                     var msg4_request_data = {
-                                                                                        'client_id': 0,
+                                                                                        'client_id': client_ID,
                                                                                         'length': 161,
                                                                                         'msg4': hexstring_msg4,
                                                                                     };
@@ -796,75 +849,75 @@
 
 
                                                                                 })
-                                                                                .catch(function(err){
-                                                                                    console.log("encrypt fail")
-                                                                                    console.error(err);
-                                                                                });
+.catch(function(err){
+    console.log("encrypt fail")
+    console.error(err);
+});
 
-                                                                            })
-                                                                            .catch(function(err){
-                                                                                console.log("import sk_key error")
-                                                                                console.error(err);
-                                                                            });
-
-
-                                                                            
+})
+.catch(function(err){
+    console.log("import sk_key error")
+    console.error(err);
+});
 
 
-                                                                        },
-                                                                        error: function(jqXHR, textStatus, errorThrown) {
-                                                                            console.log(textStatus, errorThrown);
-                                                                        }
+
+
+
+},
+error: function(jqXHR, textStatus, errorThrown) {
+    console.log(textStatus, errorThrown);
+}
 
 
                                                                     }); // receiving msg3 from server
 
-                                                                },
-                                                                error: function(jqXHR, textStatus, errorThrown) {
-                                                                    console.log(textStatus, errorThrown);
-                                                                }
+},
+error: function(jqXHR, textStatus, errorThrown) {
+    console.log(textStatus, errorThrown);
+}
 
 
                                                             }); // send msg2 to server
-                                                        })
-                                                        .catch(function(err) {
-                                                            console.log("sign gb_ga error");
-                                                            console.error(err);
-                                                        });
+})
+.catch(function(err) {
+    console.log("sign gb_ga error");
+    console.error(err);
+});
 
-                                                })
-                                                .catch(function(err) {
-                                                    console.log("import private key error");
-                                                    console.error(err);
-                                                });
+})
+.catch(function(err) {
+    console.log("import private key error");
+    console.error(err);
+});
 
 
 
-                                        }).catch = function(e) {
-                                            console.log("derived shared key error");
-                                            console.log(e.message);
-                                        }
-                                })
-                                .catch(function(e) {
-                                    console.log("import public key error")
-                                    console.error(e);
-                                });
+}).catch = function(e) {
+    console.log("derived shared key error");
+    console.log(e.message);
+}
+})
+.catch(function(e) {
+    console.log("import public key error")
+    console.error(e);
+});
 
-                        } else {
-                            alert("Cryptography API not Supported");
-                        }
+} else {
+    alert("Cryptography API not Supported");
+}
 
-                    },
-                    error: function(xhr, textStatus, errorThrown) {
-                        console.log('ajax loading error...');
-                        return false;
-                    }
-                });
+},
+error: function(xhr, textStatus, errorThrown) {
+    console.log('ajax loading error...');
+    return false;
+}
+});
 
             }); // end of Client
 
-        });
-    </script>
+});
+</script>
 </body>
 
 </html>
