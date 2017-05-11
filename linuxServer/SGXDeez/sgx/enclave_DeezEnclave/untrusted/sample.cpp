@@ -34,8 +34,8 @@ int SGX_CDECL main(int argc, char *argv[])
 
     Server sgx_server(&client_configuration);
 
-    sgx_server.InitializeCommunication();
-
+//    sgx_server.InitializeCommunication();
+    sgx_server.StartCommunication();
 
 
     return 0;

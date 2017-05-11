@@ -198,3 +198,133 @@ void ra_free_network_response_buffer(ra_samp_response_header_t *resp)
         free(resp);
     }
 }
+
+int ra_network_send_MSG1(Socket *S, int socket_fd, const ra_samp_request_header_t *p_req)
+{
+	int ret = 0;
+
+	int size;
+	size = sizeof(sample_ra_msg1_t);
+
+	printf( "sent size:%d\n", size);
+
+	S->Send(socket_fd, (char *)(&size), sizeof(int));
+	S->Send(socket_fd, (char *)(p_req->body), size);
+
+	printf("msg1 sent! \n");
+	return ret;
+}
+
+int ra_network_recv_MSG2(Socket *S, int socket_fd, ra_samp_response_header_t **p_resp)
+{
+	int ret = 0;
+
+	char *msg2;
+	int length = 0;
+	int pos = 0;
+	int recvLength;
+	while(true)
+	{
+		if (!length)
+		{
+			if(S->Recv(socket_fd,(char*)&length,4)!=4)
+			{
+				printf("CLIENT: Recv Error! Error code: %d\n", errno);
+				printf("Error description is : %s\n", strerror(errno));
+				return 0;
+			}
+			msg2 = new char[length];
+			printf("msg2 length is : %d\n", length);
+		}
+		else
+		{
+			while (pos < length)
+			{
+				recvLength = S->Recv(socket_fd, msg2+pos,length-pos);
+				printf("recvLength is%d\n",recvLength);
+				if (recvLength < 0)
+				{
+					printf("CLIENT: Recv Error! Error code: %d\n", errno);
+					printf("Error description is : %s\n", strerror(errno));
+					return 0;
+				}
+				pos += recvLength;
+			}
+			break;
+		}
+	}
+	if (length >= 0)
+	{
+		*p_resp = (ra_samp_response_header_t*) msg2;
+	}
+	printf( "msg2 received!\n");
+	return ret;
+}
+
+
+
+int ra_network_send_MSG3(Socket *S, int socket_fd, const ra_samp_request_header_t *p_req)
+{
+	int ret = 0;
+
+	int size;
+	size  = 1452;;
+
+	printf( "sent size:%d\n", size);
+
+	S->Send(socket_fd, (char *)(&size), sizeof(int));
+	S->Send(socket_fd, (char *)(p_req->body), size);
+
+	printf("msg3 sent! \n");
+	return ret;
+}
+int ra_network_recv_MSG4(Socket *S, int socket_fd, ra_samp_response_header_t **p_resp)
+{
+	int ret = 0;
+
+	char *msg4;
+	int length = 0;
+	int pos = 0;
+	int recvLength;
+
+	char msg[] = "data";
+	S->Send(socket_fd, msg, strlen(msg)+1);
+
+
+	while(true)
+	{
+		if (!length)
+		{
+			if(S->Recv(socket_fd,(char*)&length,4)!=4)
+			{
+				printf("CLIENT: Recv Error! Error code: %d\n", errno);
+				printf("Error description is : %s\n", strerror(errno));
+				return 0;
+			}
+			msg4 = new char[length];
+			printf("msg4 length is : %d\n", length);
+		}
+		else
+		{
+			while (pos < length)
+			{
+				recvLength = S->Recv(socket_fd, msg4+pos,length-pos);
+				printf("recvLength is%d\n",recvLength);
+				if (recvLength < 0)
+				{
+					printf("CLIENT: Recv Error! Error code: %d\n", errno);
+					printf("Error description is : %s\n", strerror(errno));
+					return 0;
+				}
+				pos += recvLength;
+			}
+			break;
+		}
+	}
+	if (length >= 0)
+	{
+		*p_resp = (ra_samp_response_header_t*) msg4;
+	}
+	printf( "msg4 received!\n");
+	return ret;
+}

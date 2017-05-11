@@ -93,6 +93,11 @@ int ra_network_send_receive(Socket *S, int socket_fd,
     ra_samp_response_header_t **p_resp);
 void ra_free_network_response_buffer(ra_samp_response_header_t *resp);
 
+int ra_network_send_MSG1(Socket *S, int socket_fd, const ra_samp_request_header_t *p_req);
+int ra_network_recv_MSG2(Socket *S, int socket_fd, ra_samp_response_header_t **p_resp);
+int ra_network_send_MSG3(Socket *S, int socket_fd, const ra_samp_request_header_t *p_req);
+int ra_network_recv_MSG4(Socket *S, int socket_fd, ra_samp_response_header_t **p_resp);
+
 #ifdef  __cplusplus
 }
 #endif

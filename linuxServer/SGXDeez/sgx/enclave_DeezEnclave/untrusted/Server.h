@@ -57,9 +57,10 @@ public:
 	Server(Config * client_information);
 	virtual ~Server();
 
-	bool InitializeCommunication(void);
+//	bool InitializeCommunication(void);
 	void StartListening(void);
 	void StartDataExchangeListening(void);
+	bool StartCommunication(void);
 
 
 	void TimeStart();
