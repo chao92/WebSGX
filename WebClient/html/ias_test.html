@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Demo page</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        div.result {
+            background-color: #cccccc;
+            word-wrap: break-word;
+        }
+        .cyphertext {
+            word-wrap: break-word;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Computing Demo <small>Client Attestation</small></h1>
+            <p>vk_key: shared secret key for REPORT_DATA
+                <br>mk_key: shared secret key for generating MAC's
+                <br> sk_key: shared secret key for encryption
+                <br>smk_key: used only for SIGMA protocol</p>
+            </div>
+
+            <h2>Client</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="usr">Name:</label>
+                      <input type="text" class="form-control" id="usr">
+                  </div>
+                  <div class="form-group">
+                      <label for="pwd">Password:</label>
+                      <input type="password" class="form-control" id="pwd">
+                  </div>
+                  <div class="form-group">
+                      <label for="priKey">Private Key:</label>
+                      <input type="password" class="form-control" id="priKey">
+                  </div>
+                  <div class="form-group">
+                      <label for="pubKey_x">Public Key x:</label>
+                      <input type="password" class="form-control" id="pubKey_x">
+                  </div>
+                  <div class="form-group">
+                      <label for="pubKey_y">Public Key y:</label>
+                      <input type="password" class="form-control" id="pubKey_y">
+                  </div>
+                  <button id="A_btn_start_Attestation" class="btn btn-primary">Start Attestation</button>
+
+              </div>
+              <div class="col-md-7 col-md-offset-1 result">
+                <h3>Input is: </h3>
+                <p>username: <span id="client_username" class="ciphertext"></span> </p>
+                <p>password: <span id="client_password" class="ciphertext"></span> </p>
+                <p>SSL Setting: <span id="client_password" class="ciphertext">nSSL</span> </p>
+                <p>Client Private Key (for signing ga_gb): <span id="client_private_key" class="ciphertext"></span> </p>
+                <p>Client Public Key x: <span id="client_public_key_x" class="ciphertext"></span> </p>
+                <p>Client Public Key y: <span id="client_public_key_y" class="ciphertext"></span> </p>
+                <h3>Extract Public key send from server and GID from Received MSG1 </h3>
+                <p>Client Received MSG1: <span id="A_RECEIVED MSG1" class="ciphertext"></span> </p>
+                <p>RECEIVED ga_x: <span id="C_RECEIVED_ga_x" class="ciphertext"></span> </p>
+                <p>RECEIVED ga_y: <span id="C_RECEIVED_ga_y" class="ciphertext"></span> </p>
+                <p>RECEIVED GID: <span id="C_RECEIVED_GID" class="ciphertext"></span> </p>
+                <h3>Construct MSG2 </h3>
+                <p>Client Public Key: <span id="C_ECCDH_public_key" class="ciphertext"></span>
+                </p>
+                <p>Client Private Key: <span id="C_ECCDH_private_key" class="ciphertext"></span>
+                </p>
+                <p>Client Shared_key: <span id="C_ECCDH_shared_key" class="ciphertext"></span> </p>
+                <p>Client derived smk_key: <span id="C_ECCDH_derived_smk_key" class="ciphertext"></span> </p>
+                <p>Client derived sk_key: <span id="C_ECCDH_derived_sk_key" class="ciphertext"></span> </p>
+                <p>Client derived mk_key: <span id="C_ECCDH_derived_mk_key" class="ciphertext"></span> </p>
+                <p>Client derived vk_key: <span id="C_ECCDH_derived_vk_key" class="ciphertext"></span> </p>
+
+            </div>
+        </div>
+
+        <h3>Acknowledgements</h3> A large part of the work on the jspaillier library was done at <a href="http://www.tno.nl">TNO</a> in a project supported by the <a href="http://www.commit-nl.nl">COMMIT</a> program.
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- add ajax cross-origin -->
+    <script type="application/javascript" src="js/ajax-cross-origin/js/jquery.ajax-cross-origin.min.js"></script>
+    <!-- end of ajax cross-origin -->
+
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- add AES-CMAC -->
+    <script type="text/javascript" src="cryptojs-extension-master/lib/cryptojs-aes.min.js"></script>
+    <script type="text/javascript" src="cryptojs-extension-master/build/cmac.min.js"></script>
+    <!-- test web crypto  -->
+    <script type="text/javascript" src="js/webcrypto.js"></script>
+    <!-- end of web crypto -->
+
+    <script type="text/javascript">
+        function myfunc(list){
+            console.log(list);
+        } 
+
+        $(function() {
+
+            //Client
+            $('#A_btn_start_Attestation').click(function(event) {
+                $.ajax({
+                    // crossOrigin: true,
+                    // crossDomain: true,
+                    type: "GET",
+                    // dataType: 'jsonp',
+                    // url: "https://test-as.sgx.trustedservices.intel.com/attestation/sgx/v2/sigrl/00000020",
+                    url: "https://test-as.sgx.trustedservices.intel.com/attestation/sgx/v1/sigrl/00000BCD",
+
+                    // contentType: 'text/plain',
+
+                    // xhrFields: {
+                    //     withCredentials: true 
+                    // },
+                    // jsonpCallback: 'myfunc',
+                    error: function (xhr, status) {
+                        alert(status);
+                    },
+                    success: function (result) {
+                        alert("Callback done!");
+                    },
+                    statusCode: {
+                        200: function() {
+                            console.log("success");
+                        },
+                        404: function(){
+                            console.log("failded");
+                        }
+                    }
+                });// end ajax
+
+
+            });// end button clcik 
+        });//end function
+    </script>
+</body>
+</html>

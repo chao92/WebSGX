@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<title>Test javascript like Hex2Base64 page</title>
+</head>
+
+<body>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+
+	<!-- test web crypto  -->
+	<script type="text/javascript" src="js/webcrypto.js"></script>
+	<script type="text/javascript" src="js/client_main.js"></script>
+	<script type="text/javascript" src="js/attestation_client.js"></script>
+	
+	<!-- end of web crypto -->
+
+	<!-- test Hex2Base64 -->
+<!-- 	<script type="text/javascript">
+		var myHexString = "CC243904F1CF08B65881DA68D67FB1FFDD0FD888F9D9DE77615C1387765D88CA".toUpperCase();
+
+		var hexArray = myHexString
+		.replace(/\r|\n/g, "")
+		.replace(/([\da-fA-F]{2}) ?/g, "0x$1 ")
+		.replace(/ +$/, "")
+		.split(" ");
+		var byteString = String.fromCharCode.apply(null, hexArray);
+		var base64string = window.btoa(byteString);
+		console.log(base64string.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, ''));
+		console.log(HEX2Base64URL(myHexString));
+	</script> -->
+
+	<!-- test Unit8Array -->
+<!-- 	<script type="text/javascript">
+		var A = new Uint8Array(8);
+		A.set([1,2,3,4,5,6,7],0);
+		A.set([100],7);
+		console.log(A);
+
+		var B = new Uint8Array(A.byteLength+2);
+		B.set(A,0);
+		console.log(B);
+		console.log(A.byteLength);
+		B.set([33],A.byteLength);
+		// B.set(34,A.byteLength+1);
+		console.log(B);
+
+	</script> -->
+	<!-- test changeString -->
+<!-- 	<script type="text/javascript">
+		var C_privateKey = "11b5737cf9d93f17c0cb1a84655d3995a02824097effa5edd8ee26381eb5d6c3";
+		var C_privateKey_x = "a01532a3c0900053de60fbefefcca58793301598d308b41e6f4e364e388c2711";
+		var C_privateKey_y = "bef432c599148c94143d4ff46c2cb73e3e6a41d7eef23c047ea11e60667de425";
+
+		var arr_x = C_privateKey_x.match(/.{1,2}/g);
+		console.log(arr_x);
+		console.log(arr_x.reverse().join("").toString())
+		var arr_y = C_privateKey_y.match(/.{1,2}/g);
+		console.log(arr_y);
+		console.log(arr_y.reverse().join("").toString())
+		var arr = C_privateKey.match(/.{1,2}/g);
+		console.log(arr);
+		console.log(arr.reverse().join("").toString())
+
+	</script> -->
+	<!-- test flipped string -->
+<!-- 	<script type="text/javascript">
+		var str = "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790";
+		var arr = str.match(/.{1,2}/g);
+		console.log(arr);
+		console.log("ok");
+		var flipped_arr=[];
+		for(var i=0; i < arr.length; i++){
+			var tmp = arr[i].split("").reverse().join("");
+			// console.log(tmp);
+			flipped_arr.push(tmp)
+		}
+		console.log(flipped_arr);
+
+	</script> -->
+
+	<script type="text/javascript">
+	// var x = new Uint8Array(16);
+	// x.set(hexStringToByte("2A57C3E6573D7EB2D56DE21CFB6C0132"),0);
+	// console.log(x);
+	var quote = "020001006e0d000004000400000000002a57c3e6573d7eb2d56de21cfb6c013200000000000000000000000000000000040402ffff0100000000000000000000000000000000000000000000000000000000000000000000000000000000000007000000000000000700000000000000bd6fa114b960538059d1489dc76f01c731a3ac28e9432214b24411aa6ee3d73a000000000000000000000000000000000000000000000000000000000000000083d719e77deaca1470f6baf62a4d774303c899db69020f9c70ee1dfc08c7ce9e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a336e2ff69e8622af4fd9873f6647fa71310ca2cc5949b9b8bf50a78b917f8ef0000000000000000000000000000000000000000000000000000000000000000a80200009a7c03bea4d78c6d15f226377e14c124d8ef0929eb460431f6d0427ac44d68521f811dbc09259e45910a86b79769127d77c87a62c304d7871cd16eefc63a31fd0bc7b18627dfd554888e9f002f444d76d78f311b8f8b743799800f05d14306c3c3a416833df6e4e91c178f5d70a4564954bd0e8ab49eaff5c56d8ad3921ccf2da6721428c9130c9a8192e91873a87740857f561de5e5e3fd14ec981cc3d7a410173f61657bdc9f83b4244d9311ed5dda63df470bafa6fe4ceabc104bc29895ce24da56d4abbddeb51780c6d19d0ae81116c7347c429b17e7362eb75cbd94cd51749dca991013124152971cc8c5cc6e8526e198ab571becc4c95fbf6f2ca14ccf6af0a89da38ba57440413bc01fffcec3ce05e014374f2303b00676bae38aed9790e8df8c4c6a0f793379f93568010000746d1e0c17b07fc06a4b2303dea1fda0ffe9ffa447b0b1c7ffbebba8e254c389cedf669d4ebb7e017a84c0a4bafb4793c4f09b85b56eefac1d9be2d746b8535d06d00f7ae5536a625e64bc90bd8f1a7b02863d24cc90cca25159bcbac71d5316e00bfdc0fce0d5ce3aee013ef0aaa8d8fa46f8261196925cf776955f8b8eb9097c30ffa6af958d8aad3b3475155efe95c96d1719906d41ae53d78038504f3c161b1c13b893c302b452f37d583fd814418f8156b30bc772e1899a6ebd840b4c9c1869e7667037cc3a27a5a526ad821393c3fe340bfb8be12374395fc96cf61a7468dbb8f1b38cae0950ff7e2d2a05fc3e45fab208ba2058d5df9a0bc202dc18f7dadb3dba8841ea2a93c408b7b7234a5fd775b6f389a3cca3081d559dfd90363ed521fa4e50f00d23d188b6069cad22ff044b88561ca92d049722840e746eb4e46fa503edbe5c7e45bd6d25020c280c21412af2c76ffeef1f5340fa22852c9e3feab6f1b53980108090d6717019aa9e82d51cb8a8a57c5262";
+	var base64String = hexToBase64(quote);
+	console.log(base64String);
+	</script>
+
+</body>
+
+</html>
