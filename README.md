@@ -1,4 +1,4 @@
-##WebSGX
+## WebSGX Attestation Javascript Library
 
 ### Server
 
