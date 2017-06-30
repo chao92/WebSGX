@@ -1,5 +1,6 @@
 <?php
 header("content-type:application/json");
+header('Access-Control-Allow-Origin: https://192.168.1.202', false);
 error_reporting(E_ALL);
 
 sleep(5);
