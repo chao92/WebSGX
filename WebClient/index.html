@@ -30,15 +30,50 @@
         <h2>Client</h2>
         <div class="row">
             <div class="col-md-4">
+                <div class="form-group">
+                    <label for="usr">Name:</label>
+                    <input type="text" class="form-control" id="usr">
+                </div>
+                <div class="form-group">
+                    <label for="pwd">Password:</label>
+                    <input type="password" class="form-control" id="pwd">
+                </div>
+                <div class="form-group">
+                    <label for="priKey">Private Key:</label>
+                    <input type="password" class="form-control" id="priKey">
+                </div>
+                <div class="form-group">
+                    <label for="pubKey_x">Public Key x:</label>
+                    <input type="password" class="form-control" id="pubKey_x">
+                </div>
+                <div class="form-group">
+                    <label for="pubKey_y">Public Key y:</label>
+                    <input type="password" class="form-control" id="pubKey_y">
+                </div>
+              <!--   <div class="input-group">
+                <label class="input-group-btn">
+                    <span class="btn btn-primary">
+                        Browse&hellip; <input type="file" style="display: none;" multiple>
+                    </span>
+                </label>
+                <input type="text" class="form-control" readonly>
+            </div> -->
+
+                <div class="form-group">
+                    <label class="control-label">Select File</label>
+                    <input id="input_file" type="file" class="file-loading">
+               </div>
                 <button id="A_btn_start_Attestation" class="btn btn-primary">Start Attestation</button>
 
             </div>
             <div class="col-md-7 col-md-offset-1 result">
                 <h3>Input is: </h3>
-                <p>username: <span id="client_username" class="ciphertext">user1</span> </p>
-                <p>password: <span id="client_password" class="ciphertext">13313</span> </p>
+                <p>username: <span id="client_username" class="ciphertext"></span> </p>
+                <p>password: <span id="client_password" class="ciphertext"></span> </p>
                 <p>SSL Setting: <span id="client_password" class="ciphertext">nSSL</span> </p>
-                <p>Client Private Key (for signing ga_gb): <span id="client_private key" class="ciphertext">018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790</span> </p>
+                <p>Client Private Key (for signing ga_gb): <span id="client_private_key" class="ciphertext"></span> </p>
+                <p>Client Public Key x: <span id="client_public_key_x" class="ciphertext"></span> </p>
+                <p>Client Public Key y: <span id="client_public_key_y" class="ciphertext"></span> </p>
                 <h3>Extract Public key send from server and GID from Received MSG1 </h3>
                 <p>Client Received MSG1: <span id="A_RECEIVED MSG1" class="ciphertext"></span> </p>
                 <p>RECEIVED ga_x: <span id="C_RECEIVED_ga_x" class="ciphertext"></span> </p>
@@ -58,7 +93,7 @@
             </div>
         </div>
 
-        <h3>Acknowledgements</h3> A large part of the work on the jspaillier library was done at <a href="http://www.tno.nl">TNO</a> in a project supported by the <a href="http://www.commit-nl.nl">COMMIT</a> program.
+        <h3>Acknowledgements</h3> A large part of the work based on the webcrypto and cryptojs.
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
@@ -72,9 +107,48 @@
 
     <script type="text/javascript">
         $(function() {
+            var fileContent = "";
+            var fileLength = 0;
+
+            // loading file from local disk
+            $('#input_file').change(function (ev){
+                console.log("selecting file");
+                var file = document.getElementById("input_file").files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.readAsText(file, "UTF-8");
+                    reader.onload = function (evt) {
+                        console.log("type is");
+                        var plainContent = evt.target.result;
+                        console.log(typeof(evt.target.result));
+                        console.log(plainContent);
+                        console.log("content length is");
+                        console.log(plainContent.length);
+                        fileLength = plainContent.length;
+                        console.log("conver string to ArrayBuffer");
+                        fileContent = convertStringToArrayBufferView(plainContent);
+                        console.log(fileContent);
+                        // document.getElementById("fileContents").innerHTML = evt.target.result;
+                    }
+                    reader.onerror = function (evt) {
+                        console.log("error reading file");
+                        // document.getElementById("fileContents").innerHTML = "error reading file";
+                    }
+                }
+            });
+            
 
             //Client
             $('#A_btn_start_Attestation').click(function(event) {
+
+
+                $("#client_username").text($("#usr").val());
+                var client_userName = $("#usr").val();
+                $("#client_password").text($("#pwd").val());
+                var client_password = $("#pwd").val();
+                $("#client_private_key").text($("#priKey").val());
+                $("#client_public_key_x").text($("#pubKey_x").val());
+                $("#client_public_key_y").text($("#pubKey_y").val());
 
                 // received from msg1
                 var C_RECEIVED_ga_x;
@@ -98,20 +172,42 @@
                 var ga_little;
                 var gb_little;
 
-                var C_privateKey = "7d765c220fcc805e57a185d3f5c4038f0635da25a2bec756155e986dd932b4ac"; // big-endiness
-                var C_privateKey_x = "d11e9594eca01daa8a7939e946b033c2f323c527348e40b5cd23a5ccea161aa0"; // little-endiness
-                var C_privateKey_y = "44b34aa1847b81825016e217d3cd2177dd4105ad9f32ec491f292afaf8a76cdf"; // little-endienss
+                // var C_privateKey = "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"; // big-endiness
+                // var C_privateKey_x = "72128a7a17526ebf85d03a623730aead3e3daaee9c60731db05be8621c4beb38"; // little-endiness
+                // var C_privateKey_y = "d48140d950e2577b26eeb741e7c614e224b7bdc903f29a28a83cc81011145e06"; // little-endienss
+
+                var C_privateKey = $("#priKey").val();
+                var C_privateKey_x = $("#pubKey_x").val();
+                var C_privateKey_y = $("#pubKey_y").val();
 
                 console.log("click start attestation button");
+
+
+
                 var msg1_request_data = {
-                    'username': "user2",
-                    'password': "f322",
+                    'username': client_userName,
+                    'password': client_password,
                     'SSL': "nSSL",
                     // 'privateKey': "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"
                 };
+
+                var client_ID = client_userName.match(/\d+/)[0] - 1;
+
+                // var msg1_request_data = {
+                //     'username': "user1",
+                //     'password': "13313",
+                //     'SSL': "nSSL",
+                //     // 'privateKey': "018c03d1533457adeaaeb6653b6a861fec879c4311de663bcea1522dbb6ce790"
+                // };
+                console.log("print input");
+                console.log(client_userName);
+                console.log(client_password);
+                console.log(C_privateKey);
+                console.log(C_privateKey_x);
+                console.log(C_privateKey_y);
                 $.ajax({
                     type: "POST",
-                    url: "recv_MSG1.php",
+                    url: "https://vpn.centromereinc.com/recv_MSG1.php",
                     data: msg1_request_data,
                     dataType: "JSON",
                     success: function(text) {
@@ -390,11 +486,48 @@
                                                             console.log("msg2_head");
                                                             console.log(msg2_head);
 
+                                                            // first get sig_rl from IAS based on GID;
+                                                            var sig_rl_size = 0;
+                                                            var sig_rl = "";
+                                                            var sig_rl_request_data = {
+                                                                'GID': C_RECEIVED_GID
+                                                            };
+
+                                                            $.ajax({
+                                                                type: "POST",
+                                                                url: "iasConn.php",
+                                                                data: sig_rl_request_data,
+                                                                dataType: "JSON",
+                                                                success: function(response) {
+
+                                                                    if (response['result']) {
+
+                                                                        console.log("retrieving sig_rl success based on GID");
+                                                                        console.log("sig_rl_size is ");
+                                                                        sig_rl_size = response['sig_rl_size'];
+                                                                        console.log(sig_rl_size);
+
+                                                                        if (sig_rl_size) {
+                                                                            sig_rl = $response['sig_rl'];
+                                                                            console.log("sig_rl is exist, and it's ");
+                                                                            console.log(sig_rl);
+                                                                        }
+
+                                                                    }
+
+                                                                },
+                                                                error: function(jqXHR, textStatus, errorThrown) {
+                                                                    console.log(textStatus, errorThrown);
+                                                                }
+
+                                                            }); // get sig_rl from IAS based on GID
+
                                                             // generate msg2: length is 168 bytes {gb, spid, quote_type, kdf_id, sign_gb_ga, mac, sig_rl_size}
                                                             var msg2 = new Uint8Array(168);
                                                             msg2.set(gb_little, 0) // add gb Uint8Array(64) to msg2 gb is now little-endiness
                                                             var msg2_spid = new Uint8Array(16);
-                                                            msg2_spid.set(convertStringToArrayBufferView("Service X"), 0);
+                                                            // msg2_spid.set(convertStringToArrayBufferView("Service X"), 0);
+                                                            msg2_spid.set(hexStringToByte("2A57C3E6573D7EB2D56DE21CFB6C0132"),0);
                                                             msg2.set(msg2_spid, gb.byteLength); // add spid Uint8Array(16) to msg2
 
                                                             var msg2_quote_type = new Uint16Array(1) // 1: linkable, 0 unlinkable
@@ -446,7 +579,7 @@
                                                             console.log(hexstring_msg2);
 
                                                             var msg2_request_data = {
-                                                                'client_id': 1,
+                                                                'client_id': client_ID,
                                                                 'length': 176,
                                                                 'msg2': hexstring_msg2,
 
@@ -455,7 +588,7 @@
                                                             // send msg2 
                                                             $.ajax({
                                                                 type: "POST",
-                                                                url: "send_MSG2.php",
+                                                                url: "https://vpn.centromereinc.com/send_MSG2.php",
                                                                 data: msg2_request_data,
                                                                 dataType: "JSON",
                                                                 success: function(response) {
@@ -464,11 +597,11 @@
                                                                     // receiving msg3
 
                                                                     var msg3_request_data = {
-                                                                        'client_id': 1,
+                                                                        'client_id': client_ID,
                                                                     };
                                                                     $.ajax({
                                                                         type: "POST",
-                                                                        url: "recv_MSG3.php",
+                                                                        url: "https://vpn.centromereinc.com/recv_MSG3.php",
                                                                         data: msg3_request_data,
                                                                         dataType: "JSON",
                                                                         success: function(response) {
@@ -526,6 +659,36 @@
                                                                             console.log("quote is");
                                                                             console.log(p_quote);
 
+                                                                            var p_quote_base64 = hexToBase64(p_quote);
+
+                                                                            // need to verify the quote with IAS
+                                                                            
+                                                                            var quote_verify_request_data = {
+                                                                                'quote': p_quote_base64
+                                                                            };
+
+                                                                            $.ajax({
+                                                                                type: "POST",
+                                                                                url: "iasQuoteReport.php",
+                                                                                data: quote_verify_request_data,
+                                                                                dataType: "JSON",
+                                                                                success: function(response) {
+
+                                                                                    console.log("verify quote with IAS");
+                                                                                    console.log("qutoe is");
+                                                                                    console.log(response['quote']);
+                                                                                    console.log("response is");
+                                                                                    console.log(response);
+
+                                                                                },
+                                                                                error: function(jqXHR, textStatus, errorThrown) {
+                                                                                    console.log(textStatus, errorThrown);
+                                                                                }
+
+                                                                            }); // verify the quote with IAS
+
+
+
                                                                             var report_body = p_quote.substring(96, 864);
 
 
@@ -566,50 +729,50 @@
                                                                                         // simulate function ias_verify_attestation_evidence to generate attestation report {input p_quote, output, p_attestation_report}
 
                                                                                         // 1.Decrypt the Quote signature and verify
-                                                                                        var p_attestation_report_id = new Uint32Array();// 0x12345678
+                                                                                        var p_attestation_report_id = new Uint32Array(); // 0x12345678
                                                                                         // p_attestation_report_id.of(0x12345678);
                                                                                         p_attestation_report_id_Uint8 = new Uint8Array(p_attestation_report_id.buffer);
 
                                                                                         var p_attestation_report_status = new Uint32Array(1);
-                                                                                        p_attestation_report_status.set([0],0);
+                                                                                        p_attestation_report_status.set([0], 0);
                                                                                         var p_attestation_report_status_Uint8 = new Uint8Array(p_attestation_report_status.buffer);
 
                                                                                         var p_attestation_report_revocation_reason = new Uint32Array(1);
-                                                                                        p_attestation_report_revocation_reason.set([0],0);
+                                                                                        p_attestation_report_revocation_reason.set([0], 0);
                                                                                         var p_attestation_report_revocation_reason_Uint8 = new Uint8Array(p_attestation_report_revocation_reason.buffer);
 
                                                                                         var p_attestation_report_info_blob_epid_group_status = new Uint32Array(1);
-                                                                                        p_attestation_report_info_blob_epid_group_status.set([0],0);
+                                                                                        p_attestation_report_info_blob_epid_group_status.set([0], 0);
                                                                                         p_attestation_report_info_blob_epid_group_status_Uint8 = new Uint8Array(p_attestation_report_info_blob_epid_group_status.buffer);
 
                                                                                         var p_attestation_report_info_blob_tcb_evaluation_status = new Uint32Array(1);
-                                                                                        p_attestation_report_info_blob_tcb_evaluation_status.set([0],0);
+                                                                                        p_attestation_report_info_blob_tcb_evaluation_status.set([0], 0);
                                                                                         p_attestation_report_info_blob_tcb_evaluation_status_Uint8 = new Uint8Array(p_attestation_report_info_blob_tcb_evaluation_status.buffer);
 
 
                                                                                         var p_attestation_report_info_blob_pse_evaluation_status = new Uint32Array(1);
-                                                                                        p_attestation_report_info_blob_pse_evaluation_status.set([0],0);
+                                                                                        p_attestation_report_info_blob_pse_evaluation_status.set([0], 0);
                                                                                         p_attestation_report_info_blob_pse_evaluation_status_Uint8 = new Uint8Array(p_attestation_report_info_blob_pse_evaluation_status.buffer);
 
                                                                                         var p_attestation_report_info_blob_equivalent_tcb_psvn = new Uint8Array(18);
-                                                                                        p_attestation_report_info_blob_equivalent_tcb_psvn.set([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],0);
+                                                                                        p_attestation_report_info_blob_equivalent_tcb_psvn.set([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0);
 
                                                                                         var p_attestation_report_info_blob_pse_isvsvn = new Uint8Array(2);
-                                                                                        p_attestation_report_info_blob_pse_isvsvn.set([0,0],0);
+                                                                                        p_attestation_report_info_blob_pse_isvsvn.set([0, 0], 0);
 
                                                                                         var p_attestation_report_info_blob_psda_svn = new Uint8Array(4);
-                                                                                        p_attestation_report_info_blob_psda_svn.set([0,0,0,0],0);
+                                                                                        p_attestation_report_info_blob_psda_svn.set([0, 0, 0, 0], 0);
 
                                                                                         var p_attestation_report_info_blob_rekey_gid = new Uint8Array(4);
-                                                                                        p_attestation_report_info_blob_rekey_gid.set([0,0,0,0],0);
+                                                                                        p_attestation_report_info_blob_rekey_gid.set([0, 0, 0, 0], 0);
 
                                                                                         // signing the attestation_report using private key
 
                                                                                         var p_attestation_report_pse_status = new Uint32Array(1);
-                                                                                        p_attestation_report_pse_status.set([0],0);
+                                                                                        p_attestation_report_pse_status.set([0], 0);
 
                                                                                         var p_attestation_report_policy_report_size = new Uint32Array(1);
-                                                                                        p_attestation_report_policy_report_size.set([0],0);
+                                                                                        p_attestation_report_policy_report_size.set([0], 0);
 
 
                                                                                     }
@@ -634,7 +797,7 @@
                                                                             msg4_head.set(msg4_head_status, msg4_head_type.byteLength); // add status Uint8Array(2) to msg2_head 
 
                                                                             var msg4_head_size = new Uint32Array(1); // 145head + g_secret 8
-                                                                            msg4_head_size.set([153], 0);
+                                                                            msg4_head_size.set([1001], 0);
                                                                             var msg4_head_size_Uint8 = new Uint8Array(msg4_head_size.buffer);
 
                                                                             msg4_head.set(msg4_head_size_Uint8, msg4_head_type.byteLength + msg4_head_status.byteLength);
@@ -656,159 +819,172 @@
 
                                                                             var mac = hexStringToByte(CryptoJS.CMAC(key, message).toString());
 
-                                                                            msg4_body_mac.set(mac,0);
+                                                                            msg4_body_mac.set(mac, 0);
 
 
 
                                                                             var msg4_body_secret = new Uint8Array(32);
 
                                                                             var msg4_body_secret_payload_size = new Uint32Array(1);
-                                                                            msg4_body_secret_payload_size.set([8],0);
+                                                                            msg4_body_secret_payload_size.set([856], 0);
                                                                             var msg4_body_secret_payload_size_Uint8 = new Uint8Array(msg4_body_secret_payload_size.buffer);
-                                                                            console.log("size of secret is 8");
+                                                                            console.log("size of secret is 856");
                                                                             console.log(msg4_body_secret_payload_size_Uint8)
 
-                                                                            msg4_body_secret.set(msg4_body_secret_payload_size_Uint8,0);
+                                                                            msg4_body_secret.set(msg4_body_secret_payload_size_Uint8, 0);
 
                                                                             console.log("seccret part is");
                                                                             console.log(msg4_body_secret);
 
-                                                                            var msg4_body_sent_out_secrets = new Uint8Array(8); 
+                                                                            var msg4_body_sent_out_secrets = new Uint8Array(856);
                                                                             // msg4_body_g_secrets.set([0,1,2,3,4,5,6,7],0);
 
                                                                             var secret_plain_tex = new Uint8Array(8);
-                                                                            secret_plain_tex.set([8,9,10,11,12,13,14,15],0);
+                                                                            secret_plain_tex.set([0, 1, 2, 3, 4, 5, 6, 7], 0);
+
+                                                                            console.log("-------------our local loaded file is-------------");
+                                                                            console.log(fileContent);
 
                                                                             // encrypt g_secrets using sk_key with algorithm aes-gcm
 
                                                                             window.crypto.subtle.importKey(
-                                                                                "jwk", //can be "jwk" or "raw"
-                                                                                {   //this is an example jwk key, "raw" would be an ArrayBuffer
-                                                                                    kty: "oct",
-                                                                                    k: HEX2Base64URL(C_sk_key),
-                                                                                    alg: "A128GCM",
-                                                                                    ext: true,
-                                                                                },
-                                                                                {   //this is the algorithm options
-                                                                                    name: "AES-GCM",
-                                                                                },
-                                                                                false, //whether the key is extractable (i.e. can be used in exportKey)
-                                                                                ["encrypt", "decrypt"] //can "encrypt", "decrypt", "wrapKey", or "unwrapKey"
-                                                                            )
-                                                                            .then(function(sk_key){
-                                                                                //returns the symmetric key
-                                                                                console.log("imported sk_key for AES-GCM128");
-                                                                                console.log(sk_key);
-                                                                                var aes_gcm_iv = new Uint8Array(12);
-                                                                                aes_gcm_iv.set([0,0,0,0,0,0,0,0,0,0,0,0],0);
-
-
-
-
-
-                                                                                window.crypto.subtle.encrypt(
-                                                                                    {
+                                                                                    "jwk", //can be "jwk" or "raw"
+                                                                                    { //this is an example jwk key, "raw" would be an ArrayBuffer
+                                                                                        kty: "oct",
+                                                                                        k: HEX2Base64URL(C_sk_key),
+                                                                                        alg: "A128GCM",
+                                                                                        ext: true,
+                                                                                    }, { //this is the algorithm options
                                                                                         name: "AES-GCM",
-
-                                                                                        //Don't re-use initialization vectors!
-                                                                                        //Always generate a new iv every time your encrypt!
-                                                                                        //Recommended to use 12 bytes length
-                                                                                        // iv: window.crypto.getRandomValues(new Uint8Array(12)),
-                                                                                        iv: aes_gcm_iv,
-
-                                                                                        //Additional authentication data (optional)
-                                                                                        // additionalData: ArrayBuffer,
-
-                                                                                        // //Tag length (optional)
-                                                                                        // tagLength: 128, //can be 32, 64, 96, 104, 112, 120 or 128 (default)
                                                                                     },
-                                                                                    sk_key, //from generateKey or importKey above
-                                                                                    secret_plain_tex //ArrayBuffer of data you want to encrypt
+                                                                                    false, //whether the key is extractable (i.e. can be used in exportKey)
+                                                                                    ["encrypt", "decrypt"] //can "encrypt", "decrypt", "wrapKey", or "unwrapKey"
                                                                                 )
-                                                                                .then(function(encrypted){
-                                                                                    //returns an ArrayBuffer containing the encrypted data
-                                                                                    
-                                                                                    var tmp_aes_secrets = new Uint8Array(encrypted);
-                                                                                    console.log("output of AES-GCM128");
-                                                                                    console.log(tmp_aes_secrets);
-                                                                                    msg4_body_sent_out_secrets.set(tmp_aes_secrets.subarray(0,8),0);
-                                                                                    console.log("encrypted g_secret");
-                                                                                    console.log(msg4_body_sent_out_secrets);
+                                                                                .then(function(sk_key) {
+                                                                                    //returns the symmetric key
+                                                                                    console.log("imported sk_key for AES-GCM128");
+                                                                                    console.log(sk_key);
+                                                                                    var aes_gcm_iv = new Uint8Array(12);
+                                                                                    aes_gcm_iv.set([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0);
+                                                                                    console.log("aes_gcm_iv type is");
+                                                                                    console.log(typeof(aes_gcm_iv));
 
-                                                                                    var msg4_body_secret_payload_tag = new Uint8Array(16);
-                                                                                    msg4_body_secret_payload_tag.set(tmp_aes_secrets.subarray(8,24),0);
+                                                                                    window.crypto.subtle.encrypt({
+                                                                                                name: "AES-GCM",
 
-                                                                                    console.log("payload_tag is");
-                                                                                    console.log(msg4_body_secret_payload_tag);
+                                                                                                //Don't re-use initialization vectors!
+                                                                                                //Always generate a new iv every time your encrypt!
+                                                                                                //Recommended to use 12 bytes length
+                                                                                                // iv: window.crypto.getRandomValues(new Uint8Array(12)),
+                                                                                                iv: aes_gcm_iv,
 
-                                                                                    // add payload_tag
-                                                                                    msg4_body_secret.set(msg4_body_secret_payload_tag,16);
+                                                                                                //Additional authentication data (optional)
+                                                                                                // additionalData: ArrayBuffer,
 
-                                                                                    console.log("msg4_body_secret");
-                                                                                    console.log(msg4_body_secret);
+                                                                                                // //Tag length (optional)
+                                                                                                // tagLength: 128, //can be 32, 64, 96, 104, 112, 120 or 128 (default)
+                                                                                            },
+                                                                                            sk_key, //from generateKey or importKey above
+                                                                                            fileContent
+                                                                                            // secret_plain_tex //ArrayBuffer of data you want to encrypt
+                                                                                        )
+                                                                                        .then(function(encrypted) {
+                                                                                            //returns an ArrayBuffer containing the encrypted data
 
+                                                                                            var tmp_aes_secrets = new Uint8Array(encrypted);
+                                                                                            console.log("output of AES-GCM128");
+                                                                                            console.log(tmp_aes_secrets);
+                                                                                            msg4_body_sent_out_secrets.set(tmp_aes_secrets.subarray(0, 856), 0);
+                                                                                            console.log("encrypted g_secret");
+                                                                                            console.log(msg4_body_sent_out_secrets);
 
+                                                                                            var msg4_body_secret_payload_tag = new Uint8Array(16);
+                                                                                            msg4_body_secret_payload_tag.set(tmp_aes_secrets.subarray(856, 872), 0);
 
-                                                                                    // msg4_body 97+16+32+8 {platform_info_blob(97), mac(16), secret(32) + 8}
-                                                                                    var msg4_body = new Uint8Array(153);
-                                                                                    msg4_body.set(msg4_body_platform_info,0);
-                                                                                    msg4_body.set(msg4_body_mac, msg4_body_platform_info.byteLength);
-                                                                                    msg4_body.set(msg4_body_secret, msg4_body_platform_info.byteLength + msg4_body_mac.byteLength);
-                                                                                    msg4_body.set(msg4_body_sent_out_secrets, msg4_body_platform_info.byteLength + msg4_body_mac.byteLength+msg4_body_secret.byteLength);
+                                                                                            console.log("payload_tag is");
+                                                                                            console.log(msg4_body_secret_payload_tag);
 
-                                                                                    console.log("msg4_body");
-                                                                                    console.log(msg4_body);
+                                                                                            // add payload_tag
+                                                                                            msg4_body_secret.set(msg4_body_secret_payload_tag, 16);
 
-
-                                                                                     // concate msg2_head and msg2
-                                                                                    var msg4_full = new Uint8Array(161) // 8+153
-                                                                                    msg4_full.set(msg4_head, 0);
-                                                                                    msg4_full.set(msg4_body, msg4_head.byteLength);
-
-                                                                                    console.log("msg4_full");
-                                                                                    console.log(msg4_full);
-                                                                                    var hexstring_msg4 = byteToHexString(msg4_full);
-                                                                                    console.log(hexstring_msg4);
-
-                                                                                    // send msg4 to server
-                                                                                    var msg4_request_data = {
-                                                                                        'client_id': 1,
-                                                                                        'length': 161,
-                                                                                        'msg4': hexstring_msg4,
-                                                                                    };
-                                                                                    $.ajax({
-                                                                                        type: "POST",
-                                                                                        url: "send_MSG4.php",
-                                                                                        data: msg4_request_data,
-                                                                                        dataType: "JSON",
-                                                                                        success: function(response) {
-
-                                                                                            console.log(response);
-                                                                                            console.log(response['signal']);
-
-                                                                                        },
-                                                                                        error: function(jqXHR, textStatus, errorThrown) {
-                                                                                            console.log(textStatus, errorThrown);
-                                                                                        }
+                                                                                            console.log("msg4_body_secret");
+                                                                                            console.log(msg4_body_secret);
 
 
-                                                                                    }); // sending msg4 to server
 
+                                                                                            // msg4_body 97+16+32+8 {platform_info_blob(97), mac(16), secret(32) + 8}
+                                                                                            // new test 97 + 16 + 32 + 856 = 1001
+                                                                                            var msg4_body = new Uint8Array(1001);
+                                                                                            msg4_body.set(msg4_body_platform_info, 0);
+                                                                                            msg4_body.set(msg4_body_mac, msg4_body_platform_info.byteLength);
+                                                                                            msg4_body.set(msg4_body_secret, msg4_body_platform_info.byteLength + msg4_body_mac.byteLength);
+                                                                                            msg4_body.set(msg4_body_sent_out_secrets, msg4_body_platform_info.byteLength + msg4_body_mac.byteLength + msg4_body_secret.byteLength);
+
+                                                                                            console.log("msg4_body");
+                                                                                            console.log(msg4_body);
+
+
+                                                                                            // concate msg2_head and msg2
+                                                                                            var msg4_full = new Uint8Array(1009) // 8+1001
+                                                                                            msg4_full.set(msg4_head, 0);
+                                                                                            msg4_full.set(msg4_body, msg4_head.byteLength);
+
+                                                                                            console.log("msg4_full");
+                                                                                            console.log(msg4_full);
+                                                                                            var hexstring_msg4 = byteToHexString(msg4_full);
+                                                                                            console.log(hexstring_msg4);
+
+                                                                                            // send msg4 to server
+                                                                                            var msg4_request_data = {
+                                                                                                'client_id': client_ID,
+                                                                                                'length': 1009,
+                                                                                                'msg4': hexstring_msg4,
+                                                                                            };
+                                                                                            $.ajax({
+                                                                                                type: "POST",
+                                                                                                url: "https://vpn.centromereinc.com/send_MSG4.php",
+                                                                                                data: msg4_request_data,
+                                                                                                dataType: "JSON",
+                                                                                                success: function(response) {
+
+                                                                                                    console.log(response);
+                                                                                                    console.log(response['signal']);
+
+                                                                                                    // first encrypted the file 
+                                                                                                    // console.log("start to send file to the server");
+                                                                                                    // aes_gcm_iv.set([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0);
+                                                                                                    // window.crypto.subtle.encrypt({
+                                                                                                    //     name: "AES-GCM",
+                                                                                                    //     iv: aes_gcm_iv,
+                                                                                                    // },
+                                                                                                    //     sk_key, //from generateKey or importKey above
+                                                                                                    //     fileContent //ArrayBuffer of data you want to encrypt
+                                                                                                    // ).then(function(encrypted) {
+
+                                                                                                    // };
+                                                                                                    // sending encrypted file to server
+                                                                                                },
+                                                                                                error: function(jqXHR, textStatus, errorThrown) {
+                                                                                                    console.log(textStatus, errorThrown);
+                                                                                                }
+
+
+                                                                                            }); // sending msg4 to server
+
+
+                                                                                        })
+                                                                                        .catch(function(err) {
+                                                                                            console.log("encrypt fail")
+                                                                                            console.error(err);
+                                                                                        });
 
                                                                                 })
-                                                                                .catch(function(err){
-                                                                                    console.log("encrypt fail")
+                                                                                .catch(function(err) {
+                                                                                    console.log("import sk_key error")
                                                                                     console.error(err);
                                                                                 });
 
-                                                                            })
-                                                                            .catch(function(err){
-                                                                                console.log("import sk_key error")
-                                                                                console.error(err);
-                                                                            });
 
-
-                                                                            
 
 
                                                                         },

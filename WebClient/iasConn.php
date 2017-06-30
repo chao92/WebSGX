@@ -10,15 +10,17 @@ error_reporting(E_ALL);
 
 if ($_POST) {
 	$gid = $_POST["GID"];
+	// $gid = "00000BCD";
 	$base = "https://test-as.sgx.trustedservices.intel.com/attestation/sgx/v1/sigrl/";
 	$url = $base.$gid;
+	// echo $url;
 	$handle = curl_init($url);
 	curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
 	curl_setopt($handle, CURLOPT_SSLCERT, getcwd()."/IAS-cURL/bob_pfx.pem");
 	// echo getcwd()."/IAS-cURL/bob_pfx.pem"."<br>";
 	curl_setopt($handle, CURLOPT_VERBOSE, 1);
 	$response = curl_exec($handle);
-	print curl_error($handle);
+	// print curl_error($handle);
 	/* Check for 404 (file not found). */
 	$httpcode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 	// echo "http status code is ".$httpcode."<br>";
