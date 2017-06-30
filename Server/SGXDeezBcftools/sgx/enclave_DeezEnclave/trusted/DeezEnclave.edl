@@ -1,0 +1,90 @@
+/* DeezEnclave.edl - Top EDL file. */
+
+enclave {
+	from "sgx_tkey_exchange.edl" import *;
+
+    include "sgx_key_exchange.h"
+    include "sgx_trts.h"
+    
+    /* 
+     * ocall_DeezEnclave_sample - invokes OCALL to display string buffer inside the enclave.
+     *  [in]: copy the string buffer to App outside.
+     *  [string]: specifies 'str' is a NULL terminated buffer.
+     */
+    untrusted {
+        void ocall_DeezEnclave_sample([in, string] const char *str);
+                
+        /* define OCALLs here. */
+		void ocall_reference_getCharAt(int pos, [out, size = 1] char *out);
+		void ocall_reference_copy_trim(size_t start, size_t end, [out] char **out);
+		void ocall_reference_scanChromosome([in, string] const char *s, [out] char **out);
+		void ocall_print2file1([in, string] const char *s, int fileID);
+
+		//int ocall_fetchBuffer([out, size = size] uint8_t* buffer, size_t start, size_t size);
+		int ocall_fetchBuffer([out, size = size_to_fetch] uint8_t* fetched_buffers2unseal,
+								size_t size_to_fetch, 
+			                    size_t start_position_of_the_first_seg2unseal);
+		void ocall_print_string([in, string] const char *str);
+
+		// ocall for bcftools
+		void ocall_bcfenclave_sample([in, string] const char *str);
+        int ocall_hfile_oflags([in, string] const char *mode);
+        int ocall_open([in, string] const char* filename, int mode);
+        int ocall_read(int file, [out, size=size] void *buf, unsigned int size);
+        int ocall_write(int file, [in, size=size] void *buf, unsigned int size);
+        int ocall_close(int file);
+        int ocall_fsync(int file);
+    };
+
+
+    trusted {
+    	    public int ecall_DeezEnclave_sample();
+    	    
+    	    //Remote Attestation
+    	    public sgx_status_t enclave_init_ra(int b_pse,int client_id,
+	                                [out] sgx_ra_context_t *p_context);
+	                                
+        	public sgx_status_t enclave_ra_close(sgx_ra_context_t context);
+        	
+        	public sgx_status_t verify_att_result_mac(sgx_ra_context_t context,
+                                                [in,size=message_size] uint8_t* message, 
+                                                size_t message_size, 
+                                                [in,size=mac_size] uint8_t* mac, 
+                                                size_t mac_size);
+                                                  
+			public void intializingEnclave([in, string]const char *chr0, int start0, int end0);
+			
+			public void initializeIV(int client_num);                              
+			
+			public void useEnclaveGetFileSize(sgx_ra_context_t context, 
+												[in, size = data_size]char* data, 
+												int data_size, 
+												[out, size = decryptedData_size]char* decryptedData,
+												int decryptedData_size,
+												int numberofParties,
+												int client_i);    
+												
+			public void encryptData(sgx_ra_context_t context, 
+												[in, size = src_len] uint8_t *p_src, uint32_t src_len, 
+												[out, size = dst_len] uint8_t *p_dst, uint32_t dst_len);
+	
+			public void ecall_decryped_seal_buffer(sgx_ra_context_t context, 
+												[in, size = data_buffer_size]char* data2seal, int data_buffer_size,
+												[out, size = sealed_size]char* sealed_secret, int sealed_size,
+												int true_size, int64_t index, 
+												[in, size = mac_size]char * sealedDataMAC, int mac_size);
+												
+			public void ecallHere(size_t inFileSz, int numFiles,
+												[in, size = mac_size]char* sealedDataMAC, int mac_size);	
+												
+			public void calDist([out, count = 1]double *dist);	
+			
+			// new funcion for web client test
+			public sgx_status_t put_secret_data(sgx_ra_context_t context,  
+                                            [in,size=secret_size] uint8_t* p_secret,
+                                            uint32_t secret_size,
+                                            [in,count=16] uint8_t* gcm_mac);
+            // bcftool for variant call
+            public int ecall_bcfenclave_sample();																						                
+    };
+};
