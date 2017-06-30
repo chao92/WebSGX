@@ -1,10 +1,13 @@
 ######## SGX SDK Settings ########
 SGX_SDK ?= /opt/intel/sgxsdk
-SGX_MODE ?= SIM
+#SGX_MODE ?= SIM
+SGX_MODE :=HW
+SGX_PRERELEASE :=1
 SGX_ARCH ?= x64
 TRUSTED_DIR = trusted
 #UNTRUSTED_DIR = untrusted
 
+$(info the trusted is $SGX_MODE **********************************************************************) 
 ifeq ($(shell getconf LONG_BIT), 32)
 	SGX_ARCH := x86
 else ifeq ($(findstring -m32, $(CXXFLAGS)), -m32)
@@ -36,11 +39,15 @@ else
 endif
 
 ifneq ($(SGX_MODE), HW)
+$(info comiling sim in trusted ********************************************************************)
+$(info $(SGX_MODE))
 	Trts_Library_Name := sgx_trts_sim
 	Service_Library_Name := sgx_tservice_sim
 else
 	Trts_Library_Name := sgx_trts
 	Service_Library_Name := sgx_tservice
+$(info comiling HW in trusted ********************************************************************)
+$(info $(SGX_MODE))
 endif
 
 Crypto_Library_Name := sgx_tcrypto

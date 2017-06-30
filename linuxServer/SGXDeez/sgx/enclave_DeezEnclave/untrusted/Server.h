@@ -21,9 +21,9 @@
 #include "Header/config.h"
 
 #define _T(x) 				x
-#define ENCLAVE_FILE		_T("sgx/enclave_DeezEnclave/DeezEnclave.signed.so")//TODO:change the path
-#define CERTIFICATE_FILE 	_T("sgx/enclave_DeezEnclave/enclave_server.cert.pem")
-#define PRIVATE_KEY_FILE 	_T("sgx/enclave_DeezEnclave/enclave_server.key.pem")
+#define ENCLAVE_FILE		_T("DeezEnclave.signed.so")//TODO:change the path
+#define CERTIFICATE_FILE 	_T("enclave_server.cert.pem")
+#define PRIVATE_KEY_FILE 	_T("enclave_server.key.pem")
 
 typedef struct socket_client_pair
 {

@@ -3,11 +3,14 @@
 #include <ctime>
 #include <string.h>
 #include <memory.h>
+
 // Needed for definition of remote attestation messages.
 #include "Header/remote_attestation_result.h"
 
 // Needed to call untrusted key exchange library APIs, i.e. sgx_ra_proc_msg2.
 #include "sgx_ukey_exchange.h"
+
+#include "sgx_uae_service.h"
 
 // Needed to create enclave and do ecall.
 #include "sgx_urts.h"
@@ -430,6 +433,11 @@ typedef struct attestion_profile {
 //}
 int attestation_sendMSG1(sgx_enclave_id_t enclave_id, sgx_ra_context_t *context, sgx_status_t status, Socket *S, int socket_fd, int client_id, ra_samp_request_header_t** pp_msg1_full)
 {
+	sgx_target_info_t target_info;
+	sgx_epid_group_id_t epid_group_id;
+	sgx_init_quote(&target_info,&epid_group_id);
+
+	printf("testing GID value : 0x%02x%02x%02x%02x",epid_group_id[0], epid_group_id[1], epid_group_id[2], epid_group_id[3]);
 
 #if defined ATTESTATION_PROFILE
 	a_p duration;

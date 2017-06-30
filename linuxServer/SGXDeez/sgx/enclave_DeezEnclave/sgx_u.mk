@@ -1,6 +1,8 @@
 ######## SGX SDK Settings ########
 SGX_SDK ?= /opt/intel/sgxsdk
-SGX_MODE ?= SIM
+#SGX_MODE ?= SIM
+SGX_MODE := HW
+SGX_PRERELEASE ?= 1
 SGX_ARCH ?= x64
 UNTRUSTED_DIR=untrusted
 
@@ -36,9 +38,13 @@ endif
 
 ######## App Settings ########
 
+$(info The intial MODE is $(SGX_MODE)*************************************************************)
 ifneq ($(SGX_MODE), HW)
+$(info **********************comipling SIM test***************************************************)	
+$(info $(SGX_MODE))
 	Urts_Library_Name := sgx_urts_sim
 else
+$(info **********************comipling HW test****************************************************)	
 	Urts_Library_Name := sgx_urts
 endif
 

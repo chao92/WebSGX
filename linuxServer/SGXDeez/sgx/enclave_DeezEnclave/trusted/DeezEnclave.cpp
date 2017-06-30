@@ -90,7 +90,7 @@ int numOfReverseComplementary = 0;
 int * iv_counter;
 bool iv_counter_init_flag = false;
 
-uint8_t g_secret[8] = {0};
+uint8_t g_secret[856] = {0};
 
 static const sgx_ec256_public_t g_sp_pub_key[] = {
 	//pub_key No1  (the original)
@@ -960,7 +960,7 @@ sgx_status_t put_secret_data(
     sgx_ec_key_128bit_t sk_key;
 
     do {
-        if(secret_size != 8)
+        if(secret_size != 856)
         {
             ret = SGX_ERROR_INVALID_PARAMETER;
             break;
@@ -968,7 +968,7 @@ sgx_status_t put_secret_data(
 
         ret = sgx_ra_get_keys(context, SGX_RA_KEY_SK, &sk_key);
         PRINT_BYTE_ARRAY(&sk_key,16);
-        PRINT_BYTE_ARRAY(p_secret,8);
+        PRINT_BYTE_ARRAY(p_secret,856);
 
 //        ocall_print_string(sk_key,128);
         if(SGX_SUCCESS != ret)
@@ -990,7 +990,8 @@ sgx_status_t put_secret_data(
 
         uint32_t i;
         bool secret_match = true;
-        printf("print decrypted secre\n");
+        printf("print decrypted secret\n");
+        printf("secret size is %d\n",secret_size);
         for(i=0;i<secret_size;i++)
         {
         	printf("%d,",g_secret[i]);

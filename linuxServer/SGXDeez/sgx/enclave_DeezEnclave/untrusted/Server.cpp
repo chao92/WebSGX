@@ -166,6 +166,7 @@ Server::Server(Config* new_client_information)
     //	this->token = {0};
     //	this->updated = 0;
 
+    printf("The enclave path: %s\n", ENCLAVE_FILE);
     ret = sgx_create_enclave(ENCLAVE_FILE,
         SGX_DEBUG_FLAG,
         &(this->token),
@@ -173,7 +174,7 @@ Server::Server(Config* new_client_information)
         &(this->eid), NULL);
 
     if (SGX_SUCCESS != ret) {
-        printf("\nError %#x, call sgx_create_enclave fail [%s].", ret, __FUNCTION__);
+        printf("\nError %#x, call sgx_create_enclave fail [%s].\n", ret, __FUNCTION__);
         exit(EXIT_FAILURE);
     }
     else {
@@ -865,4 +866,4 @@ long long Server::TimeEnd()
 }
 
 const string Server::Certificate_File = "sgx/enclave_DeezEnclave/enclave_server.cert.pem";
-const string Server::Private_Key_File = "sgx/enclave_DeezEnclave/enclave_server.key.pem";
+const string Server::Private_Key_File = "sgx/enclave_DeezEnclave/enclave_server.key.pem";   
