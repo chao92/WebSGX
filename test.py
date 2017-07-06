@@ -5,7 +5,11 @@ chromedriver = "/Users/chaojiang/Downloads/chromedriver"
 os.environ["webdriver.chrome.driver"] = chromedriver
 
 webpage = r"https://192.168.1.202/" # edit me
-
+# notes for test
+# ga_x: bceb54eb1696d6783e77633e7d332fa0644363f33a1389f479438f81017f08f8
+# ga_y: 653b91f70a9d69eaa9bec43fa6f58be37c101c2451df6e55a93a414b05642bf4
+# gid:  00000d6e
+# end of notes
 user1 = {}
 user1['userName'] = "user1"
 user1['userPassword'] = "13313"
