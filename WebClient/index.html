@@ -50,7 +50,7 @@
                     <label for="pubKey_y">Public Key y:</label>
                     <input type="password" class="form-control" id="pubKey_y">
                 </div>
-              <!--   <div class="input-group">
+                <!--   <div class="input-group">
                 <label class="input-group-btn">
                     <span class="btn btn-primary">
                         Browse&hellip; <input type="file" style="display: none;" multiple>
@@ -58,11 +58,25 @@
                 </label>
                 <input type="text" class="form-control" readonly>
             </div> -->
+                <div class="form-group">
+                    <label class="control-label">Select Sam File</label>
+                    <input id="input_file1" type="file" class="file-loading">
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Select ref File</label>
+                    <input id="input_file2" type="file" class="file-loading">
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Select ref index File</label>
+                    <input id="input_file3" type="file" class="file-loading">
+                </div>
 
                 <div class="form-group">
                     <label class="control-label">Select File</label>
                     <input id="input_file" type="file" class="file-loading">
-               </div>
+                </div>
                 <button id="A_btn_start_Attestation" class="btn btn-primary">Start Attestation</button>
 
             </div>
@@ -110,14 +124,23 @@
             var fileContent = "";
             var fileLength = 0;
 
+            var samfileContent = "";
+            var samfileLength = 0;
+
+            var reffileContent = "";
+            var reffileLength = 0;
+
+            var refindexfileContent = "";
+            var refindexfileLength = 0;
+
             // loading file from local disk
-            $('#input_file').change(function (ev){
+            $('#input_file').change(function(ev) {
                 console.log("selecting file");
                 var file = document.getElementById("input_file").files[0];
                 if (file) {
                     var reader = new FileReader();
                     reader.readAsText(file, "UTF-8");
-                    reader.onload = function (evt) {
+                    reader.onload = function(evt) {
                         console.log("type is");
                         var plainContent = evt.target.result;
                         console.log(typeof(evt.target.result));
@@ -130,13 +153,90 @@
                         console.log(fileContent);
                         // document.getElementById("fileContents").innerHTML = evt.target.result;
                     }
-                    reader.onerror = function (evt) {
+                    reader.onerror = function(evt) {
                         console.log("error reading file");
                         // document.getElementById("fileContents").innerHTML = "error reading file";
                     }
                 }
             });
-            
+
+            $('#input_file1').change(function(ev) {
+                console.log("selecting sam file");
+                var file = document.getElementById("input_file1").files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.readAsText(file, "UTF-8");
+                    reader.onload = function(evt) {
+                        console.log("type is");
+                        var plainContent = evt.target.result;
+                        console.log(typeof(evt.target.result));
+                        console.log(plainContent);
+                        console.log("sam file content length is");
+                        console.log(plainContent.length);
+                        samfileLength = plainContent.length;
+                        console.log("conver string to ArrayBuffer");
+                        samfileContent = convertStringToArrayBufferView(plainContent);
+                        console.log(samfileContent);
+                        // document.getElementById("fileContents").innerHTML = evt.target.result;
+                    }
+                    reader.onerror = function(evt) {
+                        console.log("error reading sam file");
+                        // document.getElementById("fileContents").innerHTML = "error reading file";
+                    }
+                }
+            });
+
+            $('#input_file2').change(function(ev) {
+                console.log("selecting sam file");
+                var file = document.getElementById("input_file2").files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.readAsText(file, "UTF-8");
+                    reader.onload = function(evt) {
+                        console.log("type is");
+                        var plainContent = evt.target.result;
+                        console.log(typeof(evt.target.result));
+                        console.log(plainContent);
+                        console.log("ref file content length is");
+                        console.log(plainContent.length);
+                        reffileLength = plainContent.length;
+                        console.log("conver string to ArrayBuffer");
+                        reffileContent = convertStringToArrayBufferView(plainContent);
+                        console.log(reffileContent);
+                        // document.getElementById("fileContents").innerHTML = evt.target.result;
+                    }
+                    reader.onerror = function(evt) {
+                        console.log("error reading ref file");
+                        // document.getElementById("fileContents").innerHTML = "error reading file";
+                    }
+                }
+            });
+
+            $('#input_file3').change(function(ev) {
+                console.log("selecting sam file");
+                var file = document.getElementById("input_file3").files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.readAsText(file, "UTF-8");
+                    reader.onload = function(evt) {
+                        console.log("type is");
+                        var plainContent = evt.target.result;
+                        console.log(typeof(evt.target.result));
+                        console.log(plainContent);
+                        console.log("content length is");
+                        console.log(plainContent.length);
+                        refindexfileLength = plainContent.length;
+                        console.log("conver string to ArrayBuffer");
+                        refindexfileContent = convertStringToArrayBufferView(plainContent);
+                        console.log(refindexfileContent);
+                        // document.getElementById("fileContents").innerHTML = evt.target.result;
+                    }
+                    reader.onerror = function(evt) {
+                        console.log("error reading ref index file");
+                        // document.getElementById("fileContents").innerHTML = "error reading file";
+                    }
+                }
+            });
 
             //Client
             $('#A_btn_start_Attestation').click(function(event) {
@@ -527,7 +627,7 @@
                                                             msg2.set(gb_little, 0) // add gb Uint8Array(64) to msg2 gb is now little-endiness
                                                             var msg2_spid = new Uint8Array(16);
                                                             // msg2_spid.set(convertStringToArrayBufferView("Service X"), 0);
-                                                            msg2_spid.set(hexStringToByte("2A57C3E6573D7EB2D56DE21CFB6C0132"),0);
+                                                            msg2_spid.set(hexStringToByte("2A57C3E6573D7EB2D56DE21CFB6C0132"), 0);
                                                             msg2.set(msg2_spid, gb.byteLength); // add spid Uint8Array(16) to msg2
 
                                                             var msg2_quote_type = new Uint16Array(1) // 1: linkable, 0 unlinkable
@@ -662,7 +762,7 @@
                                                                             var p_quote_base64 = hexToBase64(p_quote);
 
                                                                             // need to verify the quote with IAS
-                                                                            
+
                                                                             var quote_verify_request_data = {
                                                                                 'quote': p_quote_base64
                                                                             };
@@ -953,6 +1053,7 @@
                                                                                                     // first encrypted the file 
                                                                                                     // console.log("start to send file to the server");
                                                                                                     // aes_gcm_iv.set([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0);
+                                                                                                    aes_gcm_iv.set([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0);
                                                                                                     // window.crypto.subtle.encrypt({
                                                                                                     //     name: "AES-GCM",
                                                                                                     //     iv: aes_gcm_iv,
@@ -963,6 +1064,194 @@
 
                                                                                                     // };
                                                                                                     // sending encrypted file to server
+
+                                                                                                    // -----------------------send sam file-----------------------
+                                                                                                    window.crypto.subtle.encrypt({
+                                                                                                                name: "AES-GCM",
+                                                                                                                iv: aes_gcm_iv,
+                                                                                                            },
+                                                                                                            sk_key,
+                                                                                                            samfileContent
+                                                                                                        )
+                                                                                                        .then(function(encrypted) {
+
+                                                                                                            var tmp_aes_secrets = new Uint8Array(encrypted);
+                                                                                                            var sam_secret_file = new Uint8Array(samfileLength);
+                                                                                                            console.log("output of AES-GCM128 of sam");
+                                                                                                            console.log(tmp_aes_secrets);
+                                                                                                            sam_secret_file.set(tmp_aes_secrets.subarray(0, samfileLength), 0);
+                                                                                                            console.log("encrypted sam file");
+                                                                                                            console.log(sam_secret_file);
+
+                                                                                                            var sam_secret_tag = new Uint8Array(16);
+                                                                                                            sam_secret_tag.set(tmp_aes_secrets.subarray(samfileLength, samfileLength + 16), 0);
+
+                                                                                                            console.log("sam file payload_tag is");
+                                                                                                            console.log(sam_secret_tag);
+
+                                                                                                            // concate file + tag (16)
+                                                                                                            let full_length = 16 + samfileLength;
+                                                                                                            var sam_full = new Uint8Array(full_length) // 16+filelength
+
+                                                                                                            sam_full.set(sam_secret_file, 0)
+                                                                                                            sam_full.set(sam_secret_tag, sam_secret_file.byteLength);
+
+                                                                                                            var hexstring_sam = byteToHexString(sam_full);
+                                                                                                            // console.log(hexstring_sam);
+                                                                                                            // send to server 
+                                                                                                            var secret_reqeust_data = {
+                                                                                                                'client_id': client_ID,
+                                                                                                                'length': full_length,
+                                                                                                                'sam': hexstring_sam,
+                                                                                                            };
+                                                                                                            $.ajax({
+                                                                                                                type: "POST",
+                                                                                                                url: "https://vpn.centromereinc.com/send_Sam.php",
+                                                                                                                data: secret_reqeust_data,
+                                                                                                                dataType: "JSON",
+                                                                                                                success: function(response) {
+                                                                                                                    console.log(response);
+
+                                                                                                                    aes_gcm_iv.set([2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0);
+
+                                                                                                                    // -----------------------send ref file-----------------------
+                                                                                                                    window.crypto.subtle.encrypt({
+                                                                                                                                name: "AES-GCM",
+                                                                                                                                iv: aes_gcm_iv,
+                                                                                                                            },
+                                                                                                                            sk_key,
+                                                                                                                            reffileContent
+                                                                                                                        )
+                                                                                                                        .then(function(encrypted) {
+
+                                                                                                                            var tmp_aes_secrets = new Uint8Array(encrypted);
+                                                                                                                            var ref_secret_file = new Uint8Array(reffileLength);
+                                                                                                                            console.log("output of AES-GCM128 of sam");
+                                                                                                                            console.log(tmp_aes_secrets);
+                                                                                                                            ref_secret_file.set(tmp_aes_secrets.subarray(0, reffileLength), 0);
+                                                                                                                            console.log("encrypted ref file");
+                                                                                                                            console.log(ref_secret_file);
+
+                                                                                                                            var ref_secret_tag = new Uint8Array(16);
+                                                                                                                            ref_secret_tag.set(tmp_aes_secrets.subarray(reffileLength, reffileLength + 16), 0);
+
+                                                                                                                            console.log("ref file payload_tag is");
+                                                                                                                            console.log(ref_secret_tag);
+
+                                                                                                                            // concate file + tag (16)
+                                                                                                                            let full_length = 16 + reffileLength;
+                                                                                                                            var ref_full = new Uint8Array(full_length) // 16+filelength
+
+                                                                                                                            ref_full.set(ref_secret_file, 0)
+                                                                                                                            ref_full.set(ref_secret_tag, ref_secret_file.byteLength);
+
+                                                                                                                            var hexstring_ref = byteToHexString(ref_full);
+                                                                                                                            // console.log(hexstring_ref);
+                                                                                                                            // send to server 
+                                                                                                                            var ref_secret_reqeust_data = {
+                                                                                                                                'client_id': client_ID,
+                                                                                                                                'length': full_length,
+                                                                                                                                'ref': hexstring_ref,
+                                                                                                                            };
+                                                                                                                            $.ajax({
+                                                                                                                                type: "POST",
+                                                                                                                                url: "https://vpn.centromereinc.com/send_Ref.php",
+                                                                                                                                data: ref_secret_reqeust_data,
+                                                                                                                                dataType: "JSON",
+                                                                                                                                success: function(response) {
+                                                                                                                                    console.log(response);
+
+                                                                                                                                    aes_gcm_iv.set([3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0);
+                                                                                                                                    //-----------------------send index file-----------------------
+                                                                                                                                    window.crypto.subtle.encrypt({
+                                                                                                                                                name: "AES-GCM",
+                                                                                                                                                iv: aes_gcm_iv,
+                                                                                                                                            },
+                                                                                                                                            sk_key,
+                                                                                                                                            refindexfileContent
+                                                                                                                                        )
+                                                                                                                                        .then(function(encrypted) {
+
+                                                                                                                                            var tmp_aes_secrets = new Uint8Array(encrypted);
+                                                                                                                                            var index_secret_file = new Uint8Array(refindexfileLength);
+                                                                                                                                            console.log("output of AES-GCM128 of index file");
+                                                                                                                                            console.log(tmp_aes_secrets);
+                                                                                                                                            index_secret_file.set(tmp_aes_secrets.subarray(0, refindexfileLength), 0);
+                                                                                                                                            console.log("encrypted index file");
+                                                                                                                                            console.log(index_secret_file);
+
+                                                                                                                                            var index_secret_tag = new Uint8Array(16);
+                                                                                                                                            index_secret_tag.set(tmp_aes_secrets.subarray(refindexfileLength, refindexfileLength + 16), 0);
+
+                                                                                                                                            console.log("index file payload_tag is");
+                                                                                                                                            console.log(index_secret_tag);
+
+                                                                                                                                            // concate file + tag (16)
+                                                                                                                                            let full_length = 16 + refindexfileLength;
+                                                                                                                                            var index_full = new Uint8Array(full_length) // 16+filelength
+
+                                                                                                                                            index_full.set(index_secret_file, 0)
+                                                                                                                                            index_full.set(index_secret_tag, index_secret_file.byteLength);
+
+                                                                                                                                            var hexstring_index = byteToHexString(index_full);
+                                                                                                                                            console.log(hexstring_index);
+                                                                                                                                            // send to server 
+                                                                                                                                            var index_secret_reqeust_data = {
+                                                                                                                                                'client_id': client_ID,
+                                                                                                                                                'length': full_length,
+                                                                                                                                                'inx': hexstring_index,
+                                                                                                                                            };
+                                                                                                                                            $.ajax({
+                                                                                                                                                type: "POST",
+                                                                                                                                                url: "https://vpn.centromereinc.com/send_Index.php",
+                                                                                                                                                data: index_secret_reqeust_data,
+                                                                                                                                                dataType: "JSON",
+                                                                                                                                                success: function(response) {
+                                                                                                                                                    console.log(response);
+                                                                                                                                                    console.log(response['sendoutis']);
+
+                                                                                                                                                },
+                                                                                                                                                error: function(jqXHR, textStatus, errorThrown) {
+                                                                                                                                                    console.log(textStatus, errorThrown);
+                                                                                                                                                }
+
+                                                                                                                                            });
+
+                                                                                                                                        })
+                                                                                                                                        .catch(function(err) {
+                                                                                                                                            console.log("encrypt fail");
+                                                                                                                                            console.error(err);
+                                                                                                                                        });
+                                                                                                                                    //-----------------------send index file-----------------------
+
+                                                                                                                                },
+                                                                                                                                error: function(jqXHR, textStatus, errorThrown) {
+                                                                                                                                    console.log(textStatus, errorThrown);
+                                                                                                                                }
+
+                                                                                                                            });
+
+                                                                                                                        })
+                                                                                                                        .catch(function(err) {
+                                                                                                                            console.log("encrypt fail");
+                                                                                                                            console.error(err);
+                                                                                                                        });
+                                                                                                                    // -----------------------send ref file-----------------------
+
+                                                                                                                },
+                                                                                                                error: function(jqXHR, textStatus, errorThrown) {
+                                                                                                                    console.log(textStatus, errorThrown);
+                                                                                                                }
+
+                                                                                                            });
+
+                                                                                                        })
+                                                                                                        .catch(function(err) {
+                                                                                                            console.log("encrypt fail");
+                                                                                                            console.error(err);
+                                                                                                        });
+                                                                                                    // -----------------------send sam file-----------------------
+
                                                                                                 },
                                                                                                 error: function(jqXHR, textStatus, errorThrown) {
                                                                                                     console.log(textStatus, errorThrown);
