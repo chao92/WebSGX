@@ -101,6 +101,30 @@ typedef struct ms_put_secret_data_t {
 	uint8_t* ms_gcm_mac;
 } ms_put_secret_data_t;
 
+typedef struct ms_put_samfile_data_t {
+	sgx_status_t ms_retval;
+	sgx_ra_context_t ms_context;
+	uint8_t* ms_p_secret;
+	uint32_t ms_secret_size;
+	uint8_t* ms_gcm_mac;
+} ms_put_samfile_data_t;
+
+typedef struct ms_put_reffile_data_t {
+	sgx_status_t ms_retval;
+	sgx_ra_context_t ms_context;
+	uint8_t* ms_p_secret;
+	uint32_t ms_secret_size;
+	uint8_t* ms_gcm_mac;
+} ms_put_reffile_data_t;
+
+typedef struct ms_put_indexfile_data_t {
+	sgx_status_t ms_retval;
+	sgx_ra_context_t ms_context;
+	uint8_t* ms_p_secret;
+	uint32_t ms_secret_size;
+	uint8_t* ms_gcm_mac;
+} ms_put_indexfile_data_t;
+
 typedef struct ms_sgx_ra_get_ga_t {
 	sgx_status_t ms_retval;
 	sgx_ra_context_t ms_context;
@@ -620,6 +644,147 @@ err:
 	return status;
 }
 
+static sgx_status_t SGX_CDECL sgx_put_samfile_data(void* pms)
+{
+	ms_put_samfile_data_t* ms = SGX_CAST(ms_put_samfile_data_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+	uint8_t* _tmp_p_secret = ms->ms_p_secret;
+	uint32_t _tmp_secret_size = ms->ms_secret_size;
+	size_t _len_p_secret = _tmp_secret_size;
+	uint8_t* _in_p_secret = NULL;
+	uint8_t* _tmp_gcm_mac = ms->ms_gcm_mac;
+	size_t _len_gcm_mac = 16 * sizeof(*_tmp_gcm_mac);
+	uint8_t* _in_gcm_mac = NULL;
+
+	if (16 > (SIZE_MAX / sizeof(*_tmp_gcm_mac))) {
+		status = SGX_ERROR_INVALID_PARAMETER;
+		goto err;
+	}
+
+	CHECK_REF_POINTER(pms, sizeof(ms_put_samfile_data_t));
+	CHECK_UNIQUE_POINTER(_tmp_p_secret, _len_p_secret);
+	CHECK_UNIQUE_POINTER(_tmp_gcm_mac, _len_gcm_mac);
+
+	if (_tmp_p_secret != NULL) {
+		_in_p_secret = (uint8_t*)malloc(_len_p_secret);
+		if (_in_p_secret == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		memcpy(_in_p_secret, _tmp_p_secret, _len_p_secret);
+	}
+	if (_tmp_gcm_mac != NULL) {
+		_in_gcm_mac = (uint8_t*)malloc(_len_gcm_mac);
+		if (_in_gcm_mac == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		memcpy(_in_gcm_mac, _tmp_gcm_mac, _len_gcm_mac);
+	}
+	ms->ms_retval = put_samfile_data(ms->ms_context, _in_p_secret, _tmp_secret_size, _in_gcm_mac);
+err:
+	if (_in_p_secret) free(_in_p_secret);
+	if (_in_gcm_mac) free(_in_gcm_mac);
+
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_put_reffile_data(void* pms)
+{
+	ms_put_reffile_data_t* ms = SGX_CAST(ms_put_reffile_data_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+	uint8_t* _tmp_p_secret = ms->ms_p_secret;
+	uint32_t _tmp_secret_size = ms->ms_secret_size;
+	size_t _len_p_secret = _tmp_secret_size;
+	uint8_t* _in_p_secret = NULL;
+	uint8_t* _tmp_gcm_mac = ms->ms_gcm_mac;
+	size_t _len_gcm_mac = 16 * sizeof(*_tmp_gcm_mac);
+	uint8_t* _in_gcm_mac = NULL;
+
+	if (16 > (SIZE_MAX / sizeof(*_tmp_gcm_mac))) {
+		status = SGX_ERROR_INVALID_PARAMETER;
+		goto err;
+	}
+
+	CHECK_REF_POINTER(pms, sizeof(ms_put_reffile_data_t));
+	CHECK_UNIQUE_POINTER(_tmp_p_secret, _len_p_secret);
+	CHECK_UNIQUE_POINTER(_tmp_gcm_mac, _len_gcm_mac);
+
+	if (_tmp_p_secret != NULL) {
+		_in_p_secret = (uint8_t*)malloc(_len_p_secret);
+		if (_in_p_secret == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		memcpy(_in_p_secret, _tmp_p_secret, _len_p_secret);
+	}
+	if (_tmp_gcm_mac != NULL) {
+		_in_gcm_mac = (uint8_t*)malloc(_len_gcm_mac);
+		if (_in_gcm_mac == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		memcpy(_in_gcm_mac, _tmp_gcm_mac, _len_gcm_mac);
+	}
+	ms->ms_retval = put_reffile_data(ms->ms_context, _in_p_secret, _tmp_secret_size, _in_gcm_mac);
+err:
+	if (_in_p_secret) free(_in_p_secret);
+	if (_in_gcm_mac) free(_in_gcm_mac);
+
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_put_indexfile_data(void* pms)
+{
+	ms_put_indexfile_data_t* ms = SGX_CAST(ms_put_indexfile_data_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+	uint8_t* _tmp_p_secret = ms->ms_p_secret;
+	uint32_t _tmp_secret_size = ms->ms_secret_size;
+	size_t _len_p_secret = _tmp_secret_size;
+	uint8_t* _in_p_secret = NULL;
+	uint8_t* _tmp_gcm_mac = ms->ms_gcm_mac;
+	size_t _len_gcm_mac = 16 * sizeof(*_tmp_gcm_mac);
+	uint8_t* _in_gcm_mac = NULL;
+
+	if (16 > (SIZE_MAX / sizeof(*_tmp_gcm_mac))) {
+		status = SGX_ERROR_INVALID_PARAMETER;
+		goto err;
+	}
+
+	CHECK_REF_POINTER(pms, sizeof(ms_put_indexfile_data_t));
+	CHECK_UNIQUE_POINTER(_tmp_p_secret, _len_p_secret);
+	CHECK_UNIQUE_POINTER(_tmp_gcm_mac, _len_gcm_mac);
+
+	if (_tmp_p_secret != NULL) {
+		_in_p_secret = (uint8_t*)malloc(_len_p_secret);
+		if (_in_p_secret == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		memcpy(_in_p_secret, _tmp_p_secret, _len_p_secret);
+	}
+	if (_tmp_gcm_mac != NULL) {
+		_in_gcm_mac = (uint8_t*)malloc(_len_gcm_mac);
+		if (_in_gcm_mac == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		memcpy(_in_gcm_mac, _tmp_gcm_mac, _len_gcm_mac);
+	}
+	ms->ms_retval = put_indexfile_data(ms->ms_context, _in_p_secret, _tmp_secret_size, _in_gcm_mac);
+err:
+	if (_in_p_secret) free(_in_p_secret);
+	if (_in_gcm_mac) free(_in_gcm_mac);
+
+	return status;
+}
+
 static sgx_status_t SGX_CDECL sgx_sgx_ra_get_ga(void* pms)
 {
 	ms_sgx_ra_get_ga_t* ms = SGX_CAST(ms_sgx_ra_get_ga_t*, pms);
@@ -752,9 +917,9 @@ err:
 
 SGX_EXTERNC const struct {
 	size_t nr_ecall;
-	struct {void* ecall_addr; uint8_t is_priv;} ecall_table[15];
+	struct {void* ecall_addr; uint8_t is_priv;} ecall_table[18];
 } g_ecall_table = {
-	15,
+	18,
 	{
 		{(void*)(uintptr_t)sgx_ecall_DeezEnclave_sample, 0},
 		{(void*)(uintptr_t)sgx_enclave_init_ra, 0},
@@ -768,6 +933,9 @@ SGX_EXTERNC const struct {
 		{(void*)(uintptr_t)sgx_ecallHere, 0},
 		{(void*)(uintptr_t)sgx_calDist, 0},
 		{(void*)(uintptr_t)sgx_put_secret_data, 0},
+		{(void*)(uintptr_t)sgx_put_samfile_data, 0},
+		{(void*)(uintptr_t)sgx_put_reffile_data, 0},
+		{(void*)(uintptr_t)sgx_put_indexfile_data, 0},
 		{(void*)(uintptr_t)sgx_sgx_ra_get_ga, 0},
 		{(void*)(uintptr_t)sgx_sgx_ra_proc_msg2_trusted, 0},
 		{(void*)(uintptr_t)sgx_sgx_ra_get_msg3_trusted, 0},
@@ -776,26 +944,26 @@ SGX_EXTERNC const struct {
 
 SGX_EXTERNC const struct {
 	size_t nr_ocall;
-	uint8_t entry_table[16][15];
+	uint8_t entry_table[16][18];
 } g_dyn_entry_table = {
 	16,
 	{
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
 	}
 };
 

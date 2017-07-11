@@ -98,6 +98,10 @@ int ra_network_recv_MSG2(Socket *S, int socket_fd, ra_samp_response_header_t **p
 int ra_network_send_MSG3(Socket *S, int socket_fd, const ra_samp_request_header_t *p_req);
 int ra_network_recv_MSG4(Socket *S, int socket_fd, ra_samp_response_header_t **p_resp);
 
+int ra_network_recv_SAM(Socket *S, int socket_fd, uint8_t **p_resp, int* data_size);
+int ra_network_recv_REF(Socket *S, int socket_fd, uint8_t **p_resp, int* data_size);
+int ra_network_recv_INDEX(Socket *S, int socket_fd, uint8_t **p_resp, int* data_size);
+
 #ifdef  __cplusplus
 }
 #endif

@@ -1013,3 +1013,182 @@ sgx_status_t put_secret_data(
     } while(0);
     return ret;
 }
+
+
+sgx_status_t put_samfile_data(
+    sgx_ra_context_t context,
+    uint8_t *p_secret,
+    uint32_t secret_size,
+    uint8_t *p_gcm_mac)
+{
+    sgx_status_t ret = SGX_SUCCESS;
+    sgx_ec_key_128bit_t sk_key;
+
+    do {
+
+    	// if(secret_size != 350851)
+     //    {
+     //    	printf("sam file size is not correct\n");
+     //        ret = SGX_ERROR_INVALID_PARAMETER;
+     //        break;
+     //    }
+
+        ret = sgx_ra_get_keys(context, SGX_RA_KEY_SK, &sk_key);
+
+        if(SGX_SUCCESS != ret)
+        {
+            break;
+        }
+
+        printf("start decrypt sam file\n");
+        // uint8_t aes_gcm_iv[12]={0};
+        uint8_t* decrypted_samfile = NULL;
+        decrypted_samfile = new uint8_t[secret_size];
+
+
+        uint8_t aes_gcm_iv[12] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        ret = sgx_rijndael128GCM_decrypt(&sk_key,
+                                         p_secret,
+                                         secret_size,
+                                         decrypted_samfile,
+                                         &aes_gcm_iv[0],
+                                         12,
+                                         NULL,
+                                         0,
+                                         (const sgx_aes_gcm_128bit_tag_t *)
+                                            (p_gcm_mac));
+
+        uint32_t i;
+        printf("print the first 10 characters of decrypted sam file\n");
+        printf("file size is %d\n",secret_size);
+        for(i = 0; i < 10; i++)
+        {
+        	printf("%d,",decrypted_samfile[i]);
+        }
+
+        if(ret != SGX_SUCCESS){
+        	ret = SGX_ERROR_UNEXPECTED;
+        }
+        printf("\n sam file decrypted successfully\n");
+    } while(0);
+    return ret;
+}
+
+sgx_status_t put_reffile_data(
+    sgx_ra_context_t context,
+    uint8_t *p_secret,
+    uint32_t secret_size,
+    uint8_t *p_gcm_mac)
+{
+    sgx_status_t ret = SGX_SUCCESS;
+    sgx_ec_key_128bit_t sk_key;
+
+    do {
+
+    	// if(secret_size != 350851)
+     //    {
+     //    	printf("sam file size is not correct\n");
+     //        ret = SGX_ERROR_INVALID_PARAMETER;
+     //        break;
+     //    }
+
+        ret = sgx_ra_get_keys(context, SGX_RA_KEY_SK, &sk_key);
+
+        if(SGX_SUCCESS != ret)
+        {
+            break;
+        }
+
+        printf("start decrypt sam file\n");
+        // uint8_t aes_gcm_iv[12]={0};
+        uint8_t* decrypted_reffile = NULL;
+        decrypted_reffile = new uint8_t[secret_size];
+
+
+        uint8_t aes_gcm_iv[12] = {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        ret = sgx_rijndael128GCM_decrypt(&sk_key,
+                                         p_secret,
+                                         secret_size,
+                                         decrypted_reffile,
+                                         &aes_gcm_iv[0],
+                                         12,
+                                         NULL,
+                                         0,
+                                         (const sgx_aes_gcm_128bit_tag_t *)
+                                            (p_gcm_mac));
+
+        uint32_t i;
+        printf("print the first 10 characters of decrypted ref file\n");
+        printf("file size is %d\n",secret_size);
+        for(i = 0; i < 10; i++)
+        {
+        	printf("%d,",decrypted_reffile[i]);
+        }
+
+        if(ret != SGX_SUCCESS){
+        	ret = SGX_ERROR_UNEXPECTED;
+        }
+        printf("\n ref file decrypted successfully\n");
+    } while(0);
+    return ret;
+}
+
+sgx_status_t put_indexfile_data(
+    sgx_ra_context_t context,
+    uint8_t *p_secret,
+    uint32_t secret_size,
+    uint8_t *p_gcm_mac)
+{
+    sgx_status_t ret = SGX_SUCCESS;
+    sgx_ec_key_128bit_t sk_key;
+
+    do {
+
+    	// if(secret_size != 350851)
+     //    {
+     //    	printf("sam file size is not correct\n");
+     //        ret = SGX_ERROR_INVALID_PARAMETER;
+     //        break;
+     //    }
+
+        ret = sgx_ra_get_keys(context, SGX_RA_KEY_SK, &sk_key);
+
+        if(SGX_SUCCESS != ret)
+        {
+            break;
+        }
+
+        printf("start decrypt index file\n");
+        PRINT_BYTE_ARRAY(p_secret,17);
+        // uint8_t aes_gcm_iv[12]={0};
+        uint8_t* decrypted_indexfile = NULL;
+        decrypted_indexfile = new uint8_t[secret_size];
+
+
+        uint8_t aes_gcm_iv[12] = {3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        ret = sgx_rijndael128GCM_decrypt(&sk_key,
+                                         p_secret,
+                                         secret_size,
+                                         decrypted_indexfile,
+                                         &aes_gcm_iv[0],
+                                         12,
+                                         NULL,
+                                         0,
+                                         (const sgx_aes_gcm_128bit_tag_t *)
+                                            (p_gcm_mac));
+
+        uint32_t i;
+        printf("print the first 10 characters of decrypted index file\n");
+        printf("file size is %d\n",secret_size);
+        for(i = 0; i < 10; i++)
+        {
+        	printf("%d,",decrypted_indexfile[i]);
+        }
+
+        if(ret != SGX_SUCCESS){
+        	ret = SGX_ERROR_UNEXPECTED;
+        }
+        printf("\n index file decrypted successfully\n");
+    } while(0);
+    return ret;
+}

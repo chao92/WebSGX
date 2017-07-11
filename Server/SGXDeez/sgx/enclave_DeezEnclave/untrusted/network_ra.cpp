@@ -328,3 +328,160 @@ int ra_network_recv_MSG4(Socket *S, int socket_fd, ra_samp_response_header_t **p
 	printf( "msg4 received!\n");
 	return ret;
 }
+
+int ra_network_recv_SAM(Socket *S, int socket_fd, uint8_t **p_resp, int* data_size)
+{
+	int ret = 0;
+
+	uint8_t *samfile;
+	int length = 0;
+	int pos = 0;
+	int recvLength;
+
+	char msg[] = "data";
+	S->Send(socket_fd, msg, strlen(msg)+1);
+
+
+	while(true)
+	{
+		if (!length)
+		{
+			if(S->Recv(socket_fd,(char*)&length,4)!=4)
+			{
+				printf("CLIENT: Recv Error! Error code: %d\n", errno);
+				printf("Error description is : %s\n", strerror(errno));
+				return 0;
+			}
+			*data_size = length;
+			samfile = new uint8_t[length];
+			printf("sam file length is : %d\n", length);
+		}
+		else
+		{
+			while (pos < length)
+			{
+				recvLength = S->Recv(socket_fd, samfile+pos,length-pos);
+				printf("recvLength is%d\n",recvLength);
+				if (recvLength < 0)
+				{
+					printf("CLIENT: Recv Error! Error code: %d\n", errno);
+					printf("Error description is : %s\n", strerror(errno));
+					return 0;
+				}
+				pos += recvLength;
+			}
+			break;
+		}
+	}
+	if (length >= 0)
+	{
+		*p_resp = (uint8_t*) samfile;
+	}
+	printf( "sam file received!\n");
+	return ret;
+}
+
+int ra_network_recv_REF(Socket *S, int socket_fd, uint8_t **p_resp, int* data_size)
+{
+	int ret = 0;
+
+	uint8_t *reffile;
+	int length = 0;
+	int pos = 0;
+	int recvLength;
+
+	char msg[] = "data";
+	S->Send(socket_fd, msg, strlen(msg)+1);
+
+
+	while(true)
+	{
+		if (!length)
+		{
+			if(S->Recv(socket_fd,(char*)&length,4)!=4)
+			{
+				printf("CLIENT: Recv Error! Error code: %d\n", errno);
+				printf("Error description is : %s\n", strerror(errno));
+				return 0;
+			}
+			*data_size = length;
+			reffile = new uint8_t[length];
+			printf("ref file length is : %d\n", length);
+		}
+		else
+		{
+			while (pos < length)
+			{
+				recvLength = S->Recv(socket_fd, reffile+pos,length-pos);
+				printf("recvLength is%d\n",recvLength);
+				if (recvLength < 0)
+				{
+					printf("CLIENT: Recv Error! Error code: %d\n", errno);
+					printf("Error description is : %s\n", strerror(errno));
+					return 0;
+				}
+				pos += recvLength;
+			}
+			break;
+		}
+	}
+	if (length >= 0)
+	{
+		*p_resp = (uint8_t*) reffile;
+	}
+	printf( "ref file received!\n");
+	return ret;
+}
+
+int ra_network_recv_INDEX(Socket *S, int socket_fd, uint8_t **p_resp, int* data_size)
+{
+	int ret = 0;
+
+	uint8_t *indexfile;
+	int length = 0;
+	int pos = 0;
+	int recvLength;
+
+	char msg[] = "data";
+	S->Send(socket_fd, msg, strlen(msg)+1);
+
+
+	while(true)
+	{
+		if (!length)
+		{
+			if(S->Recv(socket_fd,(char*)&length,4)!=4)
+			{
+				printf("CLIENT: Recv Error! Error code: %d\n", errno);
+				printf("Error description is : %s\n", strerror(errno));
+				return 0;
+			}
+			*data_size = length;
+			indexfile = new uint8_t[length];
+			printf("------index file length is : %d\n", length);
+		}
+		else
+		{
+			while (pos < length)
+			{
+				printf("pos < length and pos is %d, length is %d\n",pos,length);
+				recvLength = S->Recv(socket_fd, indexfile+pos,length-pos);
+				printf("recvLength is%d\n",recvLength);
+				if (recvLength < 0)
+				{
+					printf("CLIENT: Recv Error! Error code: %d\n", errno);
+					printf("Error description is : %s\n", strerror(errno));
+					return 0;
+				}
+				pos += recvLength;
+			}
+			break;
+		}
+	}
+	if (length >= 0)
+	{
+		*p_resp = (uint8_t*) indexfile;
+	}
+	printf( "index file received!\n");
+	return ret;
+}

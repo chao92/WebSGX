@@ -876,3 +876,174 @@ int attestation_recvMSG4(sgx_enclave_id_t enclave_id, sgx_ra_context_t *context,
 	}
 
 }
+
+int attestation_recvSAM(sgx_enclave_id_t enclave_id, sgx_ra_context_t *context, sgx_status_t status, Socket *S, int socket_fd, int client_id, uint8_t** pp_samFile, int current_client_id)
+{
+
+	int ret = 0;
+	FILE* OUTPUT = stdout;
+
+	int data_size = 0;
+
+	ret = ra_network_recv_SAM(S, socket_fd,
+		&pp_samFile[current_client_id], &data_size);
+
+	if(ret != 0 || !pp_samFile[current_client_id])
+	{
+		fprintf(OUTPUT, "\nError, ra_network_send_receive for samFile failed "
+			"[%s].", __FUNCTION__);
+	}
+	else
+	{
+		printf("sam file length is%d\n",data_size);
+
+		uint8_t* p_samFile = pp_samFile[current_client_id];
+		uint8_t* data;
+		uint8_t* data_tag;
+
+		data = new uint8_t[data_size-16];
+		data_tag = new uint8_t[16];
+
+		memcpy(data, (uint8_t *)p_samFile, data_size-16);
+		memcpy(data_tag, (uint8_t*)(p_samFile+data_size-16),16);
+
+
+
+		ret = put_samfile_data(enclave_id,&status,*context,
+			data,
+			data_size-16,
+			data_tag);
+		if((SGX_SUCCESS != ret)  || (SGX_SUCCESS != status))
+		{
+			fprintf(stdout, "\nError, attestation result message secret "
+				"using SK based AESGCM failed in [%s]. ret = "
+				"0x%0x. status = 0x%0x", __FUNCTION__, ret,
+				status);
+			SAFE_FREE(data);
+			SAFE_FREE(data_tag);
+		}
+		// fprintf(stdout, "\nSecret successfully received from server.");
+		// fprintf(stdout, "\nRemote attestation success!");
+
+		delete [] data;
+		delete [] data_tag;
+
+		return ret;
+
+	}
+
+}
+
+
+int attestation_recvREF(sgx_enclave_id_t enclave_id, sgx_ra_context_t *context, sgx_status_t status, Socket *S, int socket_fd, int client_id, uint8_t** pp_refFile, int current_client_id)
+{
+
+	int ret = 0;
+	FILE* OUTPUT = stdout;
+
+	int data_size = 0;
+
+	ret = ra_network_recv_REF(S, socket_fd,
+		&pp_refFile[current_client_id], &data_size);
+
+	if(ret != 0 || !pp_refFile[current_client_id])
+	{
+		fprintf(OUTPUT, "\nError, ra_network_send_receive for samFile failed "
+			"[%s].", __FUNCTION__);
+	}
+	else
+	{
+		printf("ref file length is%d\n",data_size);
+
+		uint8_t* p_refFile = pp_refFile[current_client_id];
+		uint8_t* data;
+		uint8_t* data_tag;
+
+		data = new uint8_t[data_size-16];
+		data_tag = new uint8_t[16];
+
+		memcpy(data, (uint8_t *)p_refFile, data_size-16);
+		memcpy(data_tag, (uint8_t*)(p_refFile+data_size-16),16);
+
+
+
+		ret = put_reffile_data(enclave_id,&status,*context,
+			data,
+			data_size-16,
+			data_tag);
+		if((SGX_SUCCESS != ret)  || (SGX_SUCCESS != status))
+		{
+			fprintf(stdout, "\nError, attestation result message secret "
+				"using SK based AESGCM failed in [%s]. ret = "
+				"0x%0x. status = 0x%0x", __FUNCTION__, ret,
+				status);
+			SAFE_FREE(data);
+			SAFE_FREE(data_tag);
+		}
+		// fprintf(stdout, "\nSecret successfully received from server.");
+		// fprintf(stdout, "\nRemote attestation success!");
+
+		delete [] data;
+		delete [] data_tag;
+
+		return ret;
+
+	}
+
+}
+
+int attestation_recvINDEX(sgx_enclave_id_t enclave_id, sgx_ra_context_t *context, sgx_status_t status, Socket *S, int socket_fd, int client_id, uint8_t** pp_refIndexFile, int current_client_id)
+{
+
+	int ret = 0;
+	FILE* OUTPUT = stdout;
+
+	int data_size = 0;
+
+	ret = ra_network_recv_INDEX(S, socket_fd,
+		&pp_refIndexFile[current_client_id], &data_size);
+
+	if(ret != 0 || !pp_refIndexFile[current_client_id])
+	{
+		fprintf(OUTPUT, "\nError, ra_network_send_receive for index file failed "
+			"[%s].", __FUNCTION__);
+	}
+	else
+	{
+		printf("index file length is%d\n",data_size);
+
+		uint8_t* p_indexFile = pp_refIndexFile[current_client_id];
+		uint8_t* data;
+		uint8_t* data_tag;
+
+		data = new uint8_t[data_size-16];
+		data_tag = new uint8_t[16];
+
+		memcpy(data, (uint8_t *)p_indexFile, data_size-16);
+		memcpy(data_tag, (uint8_t*)(p_indexFile+data_size-16),16);
+
+
+
+		ret = put_indexfile_data(enclave_id,&status,*context,
+			data,
+			data_size-16,
+			data_tag);
+		if((SGX_SUCCESS != ret)  || (SGX_SUCCESS != status))
+		{
+			fprintf(stdout, "\nError, attestation result message secret "
+				"using SK based AESGCM failed in [%s]. ret = "
+				"0x%0x. status = 0x%0x", __FUNCTION__, ret,
+				status);
+			SAFE_FREE(data);
+			SAFE_FREE(data_tag);
+		}
+		// fprintf(stdout, "\nSecret successfully received from server.");
+		// fprintf(stdout, "\nRemote attestation success!");
+		delete [] data;
+		delete [] data_tag;
+
+		return ret;
+
+	}
+
+}
