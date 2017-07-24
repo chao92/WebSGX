@@ -20,3 +20,6 @@ It used for exchange information between server and web client.
 ### WebClient
 
 ### IAS Communication
+
+#### IAS certificate
+We submitted the pfx to apply for a SPID with Intel SGX IAS, and installed the keys for communicat with IAS during attestation. the password for import the key is within the file named 'password'.
