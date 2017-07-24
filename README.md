@@ -2,6 +2,8 @@
 
 ![Overview](/Overview.png "Overview of WebSGX Attestation")
 
+Please check our google doc for detial information: [Link to Development Document](https://docs.google.com/document/d/1ODTzUhnvWBszTK9oGUVX6fY3PCQHI7qbXqOfrc2Q5ek/edit?usp=sharing)
+
 ### Server
 
 #### Environment
