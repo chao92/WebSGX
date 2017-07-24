@@ -1,5 +1,7 @@
 ## WebSGX Attestation Javascript Library
 
+![Overview](/Overview.png "Overview of WebSGX Attestation")
+
 ### Server
 
 #### Linux Server
