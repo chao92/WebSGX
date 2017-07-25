@@ -15,13 +15,16 @@ Through PHP we communicate with Linux Server by socket. Our Client call this PHP
 #### Server PHP
 It used for exchange information between server and web client.
 #### Running command:
+
 ```
 ./sample -c ../../server_config.txt
 ```
 
 ### Web Client
 
+```
 index.html -> receiveMSG1andProcess() -> deriveKeys() -> retreiveRL() -> generatAndSendMSG2() -> receiveMSG3andProcess() -> sendMSG4withFile() -> sendSamFile() -> sendRefFile() -> sendIndexFile()
+```
 
 ### Web Client Library (Node.js)
 
