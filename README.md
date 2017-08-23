@@ -21,7 +21,7 @@ It used for exchange information between server and web client.
 ```
 
 ### Web Client
-
+Call path: start from index.html, the function are called sequently as below, and the functions are defined at remoteAttestation.js.
 ```
 index.html -> receiveMSG1andProcess() -> deriveKeys() -> retreiveRL() -> generatAndSendMSG2() -> receiveMSG3andProcess() -> sendMSG4withFile() -> sendSamFile() -> sendRefFile() -> sendIndexFile()
 ```
