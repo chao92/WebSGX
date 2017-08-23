@@ -1,5 +1,5 @@
 <?php
-
+// this file is connecting with IAS for Quote report
 header("content-type:application/json");
 error_reporting(E_ALL);
 
