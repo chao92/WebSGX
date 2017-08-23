@@ -1,4 +1,5 @@
 <?php
+// this file is for connecting with Intel IAS
 // $contents = file_get_contents("https://test-as.sgx.trustedservices.intel.com/attestation/sgx/v1/sigrl/00000BCD");
 // print_r($contents);
 // $base = "https://test-as.sgx.trustedservices.intel.com/attestation/sgx/v1/sigrl/";
