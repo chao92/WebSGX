@@ -34,7 +34,9 @@ index.html -> receiveMSG1andProcess() -> deriveKeys() -> retreiveRL() -> generat
 #### IAS certificate
 
 bob_pfx.pfx is the file we submitted to Intel SGX IAS for get the SPID.
+
 keys.txt file contains all the requried input for the Intel WebSGX attestation.
+
 password file contains the passwrod for improting the certification to the computer when we want to communicate with IAS.
 
 The left three files (RK_PUB.PEM, cert.pem, key.pem) are the different format key of the certification
